@@ -1,5 +1,8 @@
 import { defineConfig } from '@pandacss/dev';
 
+import { colorList } from './src/styles/color';
+import { typographyList } from './src/styles/typography';
+
 export default defineConfig({
   // Whether to use css reset
   preflight: true,
@@ -13,10 +16,12 @@ export default defineConfig({
   // Useful for theme customization
   theme: {
     extend: {
+      textStyles: typographyList,
       tokens: {
         fonts: {
           poppins: { value: 'var(--poppins)' },
         },
+        ...colorList,
       },
     },
   },

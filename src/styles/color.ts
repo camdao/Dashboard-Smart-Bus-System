@@ -28,7 +28,7 @@ export const colorList = defineTokens({
       10: { value: '#FEF9F2' },
     },
 
-    gray: {
+    black: {
       100: { value: '#1C1D22' },
       90: { value: '#2C2D33' },
       80: { value: '#33343A' },
@@ -47,6 +47,10 @@ export const colorList = defineTokens({
 
     red: {
       100: { value: '#CC5F5F' },
+    },
+
+    white: {
+      70: { value: '#F1F3F9' },
     },
   },
 });
