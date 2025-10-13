@@ -71,6 +71,7 @@ export const WithIcon: Story = {
     placeholder: 'Enter your password',
     icon: 'lock',
     iconPosition: 'left',
+    type: 'password',
   },
 };
 
