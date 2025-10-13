@@ -21,7 +21,7 @@ export const buttonStyle = cva({
       medium: {
         width: 'fit-content',
         height: '58px',
-        padding: '0 20px',
+        padding: '0 50px',
         borderRadius: '12px',
         lineHeight: '44px',
       },

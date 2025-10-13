@@ -6,7 +6,7 @@ import { type Token, token } from '@/styled-system/tokens';
 import Icon, { type IconComponentMap } from '../Icon';
 
 interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
-  errorMsg: string;
+  errorMsg?: string;
   icon?: keyof typeof IconComponentMap;
   iconPosition?: 'left' | 'right';
   variant?: 'default' | 'filled';
@@ -35,7 +35,7 @@ const TextInput = ({ value, onChange, errorMsg, icon, variant, iconPosition = 'l
           borderColor: token.var(`colors.${getBorderColor(errorMsg, isFocused)}` as Token),
         }}
       >
-        {icon && iconPosition === 'left' && <Icon className={iconCss} name={icon} />}
+        {icon && iconPosition === 'left' && <Icon color="black.40" className={iconCss} name={icon} />}
         <input
           className={inputCss}
           onChange={handleChange}
@@ -44,7 +44,7 @@ const TextInput = ({ value, onChange, errorMsg, icon, variant, iconPosition = 'l
           readOnly={variant === 'filled'}
           {...props}
         />
-        {icon && iconPosition === 'right' && <Icon name={icon} />}
+        {icon && iconPosition === 'right' && <Icon color="black.40" name={icon} />}
       </div>
       {errorMsg && <p className={descriptionTextCss}>{errorMsg}</p>}
     </div>
