@@ -10,7 +10,7 @@ import MessageIcon from './MessageIcon';
 
 export const IconComponentMap = {
   message: MessageIcon,
-  Lock: LockIcon,
+  lock: LockIcon,
   EyeOffIcon: EyeOffIcon,
   EyeIcon: EyeIcon,
   Logout: Logout,
