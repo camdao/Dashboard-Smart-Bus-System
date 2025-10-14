@@ -47,7 +47,7 @@ const headerCss = css({
 });
 
 const container = css({
-  backgroundColor: '#F4F5FA',
+  backgroundColor: 'white.50',
   minHeight: '100vh',
   paddingTop: '121px',
 });

@@ -53,6 +53,7 @@ export const colorList = defineTokens({
 
     white: {
       70: { value: '#F1F3F9' },
+      50: { value: '#F4F5FA' },
     },
   },
 });

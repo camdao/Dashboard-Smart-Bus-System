@@ -48,7 +48,8 @@ const containerCss = flex({
   flexDirection: 'column',
   alignItems: 'center',
   height: '100vh',
-  width: '296px',
+  maxWidth: '296px',
+  width: '100%',
   padding: '24px 0',
 });
 
