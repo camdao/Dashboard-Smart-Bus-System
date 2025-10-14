@@ -10,12 +10,12 @@ export default function loginPage() {
       <div className={headerCss}>
         <Image src="/logo.svg" height={52} width={52} alt="Logo" />
       </div>
-      <div className={container}>
-        <div className={formContainer}>
+      <main className={container}>
+        <section className={formContainer}>
           <div className={formCss}>
             <div className={LogoCss}>
-              <Image className={imgCss} src="/logo.svg" height={52} width={52} alt="Logo" />
-              <div className={introContent}>
+              <Image src="/logo.svg" height={52} width={52} alt="Logo" />
+              <div className={textGroup}>
                 <div className={welcomeCss}>Welcome back!</div>
                 <div className={subtitle}>Login to your account</div>
               </div>
@@ -28,13 +28,17 @@ export default function loginPage() {
               Login
             </Button>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </>
   );
 }
 
 const headerCss = css({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
   backgroundColor: 'white',
   height: '76px',
   alignItems: 'center',
@@ -44,16 +48,16 @@ const headerCss = css({
 
 const container = css({
   backgroundColor: '#F4F5FA',
-  height: 'calc(100vh - 76px)',
+  minHeight: '100vh',
   paddingTop: '121px',
 });
 
 const formContainer = css({
+  width: '90%',
   maxWidth: '443px',
-  height: '533px',
-  margin: '0 auto',
   backgroundColor: 'white',
   borderRadius: '12px',
+  margin: '0 auto',
 });
 
 const formCss = css({
@@ -66,10 +70,11 @@ const inputCss = css({
   display: 'flex',
   flexDirection: 'column',
   gap: '30px',
+  marginBottom: '48px',
 });
 
 const buttonCss = css({
-  margin: '48px auto',
+  alignSelf: 'center',
   cursor: 'pointer',
 });
 
@@ -78,15 +83,8 @@ const LogoCss = css({
   justifyContent: 'center',
   alignItems: 'center',
   flexDirection: 'column',
-  paddingBottom: '60px',
-});
-
-const introContent = css({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flexDirection: 'column',
-  gap: '8px',
+  marginBottom: '60px',
+  gap: '20px',
 });
 
 const welcomeCss = css({
@@ -98,6 +96,10 @@ const subtitle = css({
   color: 'black.30',
 });
 
-const imgCss = css({
-  paddingBottom: '30px',
+const textGroup = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  gap: '8px',
 });
