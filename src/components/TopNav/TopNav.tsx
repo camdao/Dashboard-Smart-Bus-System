@@ -20,10 +20,9 @@ const topNavStyles = css({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '50px',
+  height: '70px',
   borderBottom: '1px solid',
   borderColor: 'white.70',
-  paddingBottom: '14px',
 });
 const dashboardTextStyles = css({
   color: 'black.60',
