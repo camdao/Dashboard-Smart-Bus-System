@@ -26,7 +26,7 @@ const navItemStyles = css({
   alignItems: 'center',
   gap: '16px',
   padding: '16px 20px',
-  borderRadius: '20px',
+  borderRadius: '12px',
   cursor: 'pointer',
   color: 'black.60',
   transition: 'background-color 0.2s, color 0.2s',
