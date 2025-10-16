@@ -1,7 +1,7 @@
 import { type InputHTMLAttributes, useState } from 'react';
-import { getBorderColor } from '@/src/utils/getBorderColor';
 import { css, cx } from '@/styled-system/css';
 import { type Token, token } from '@/styled-system/tokens';
+import { getBorderColor } from '@/utils/getBorderColor';
 
 import Icon, { type IconComponentMap } from '../Icon';
 

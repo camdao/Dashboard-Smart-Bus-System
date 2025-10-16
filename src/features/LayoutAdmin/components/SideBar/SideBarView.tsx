@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import { NAVIGATION } from '@/src/constants/navigation';
+import Icon from '@/components/Icon';
+import { NAVIGATION } from '@/features/share/constants/navigation';
 import { css } from '@/styled-system/css';
-import { flex } from '@/styled-system/patterns';
+import { flex } from '@/styled-system/patterns/flex';
 
-import Icon from '../Icon';
 import NavItem from '../NavItem/NavItem';
 
 interface Props {

@@ -1,14 +1,18 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+import { NAVIGATION } from '@/features/share/constants/navigation';
 import { css } from '@/styled-system/css';
 
-interface TopNavProps {
-  navText?: string;
-}
+const TopNav = () => {
+  const pathname = usePathname();
 
-const TopNav = ({ navText }: TopNavProps) => {
+  const current = NAVIGATION.find((item) => item.path === pathname)?.name || NAVIGATION[0].key;
+
   return (
     <>
       <div className={topNavStyles}>
-        <span className={dashboardTextStyles}>{navText}</span>
+        <span className={dashboardTextStyles}>{current}</span>
       </div>
       <div className={breadcrumbs}></div>
     </>

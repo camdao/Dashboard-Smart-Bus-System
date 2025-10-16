@@ -1,15 +1,18 @@
-'use client';
-
-import Sidebar from '@/src/components/SideBar/SideBar';
-import TopNav from '@/src/components/TopNav/TopNav';
 import { css } from '@/styled-system/css';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+import Sidebar from '../components/SideBar/SideBar';
+import TopNav from '../components/TopNav/TopNav';
+
+interface DashboardProps {
+  children: React.ReactNode;
+}
+
+export default function Dashboard({ children }: DashboardProps) {
   return (
     <div className={containerCss}>
       <Sidebar />
       <div className={mainContainer}>
-        <TopNav navText="Dashboard" />
+        <TopNav />
         <div className={mainCss}>{children}</div>
       </div>
     </div>
