@@ -57,14 +57,19 @@ const sectionCss = css({});
 
 const inputWrapperCss = css({
   display: 'flex',
-  justifyContent: 'space-between',
-  width: '100%',
-  padding: '8px 16px',
-  height: '52px',
-  boxSizing: 'border-box',
   alignItems: 'center',
-  border: '1px solid',
-  borderRadius: '8px',
+  width: '100%',
+  padding: '10px 16px',
+  height: '50px',
+  border: '1.5px solid',
+  borderRadius: '10px',
+  borderColor: 'gray.300',
+  backgroundColor: 'white',
+  transition: 'all 0.2s ease-in-out',
+  _focusWithin: {
+    borderColor: 'blue.400',
+    boxShadow: '0 0 0 3px rgba(59,130,246,0.15)',
+  },
 });
 
 const descriptionTextCss = css({
