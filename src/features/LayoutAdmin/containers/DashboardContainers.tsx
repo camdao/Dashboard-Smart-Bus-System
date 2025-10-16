@@ -1,6 +1,7 @@
-import Sidebar from '@/src/features/share/ui/LayoutAdmin/components/SideBar/SideBar';
-import TopNav from '@/src/features/share/ui/LayoutAdmin/components/TopNav/TopNav';
 import { css } from '@/styled-system/css';
+
+import Sidebar from '../components/SideBar/SideBar';
+import TopNav from '../components/TopNav/TopNav';
 
 interface DashboardProps {
   children: React.ReactNode;

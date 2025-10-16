@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
-import Button from '@/src/components/Button/Button';
-import Input from '@/src/components/Input/Input';
+import Button from '@/components/Button/Button';
+import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
 export function LoginFeature() {
