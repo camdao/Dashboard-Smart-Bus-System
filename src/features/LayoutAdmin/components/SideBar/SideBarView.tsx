@@ -13,13 +13,15 @@ interface Props {
 
 function SidebarView({ current, onClick }: Props) {
   return (
-    <div className={containerCss}>
+    <aside className={containerCss}>
+      {/* Logo */}
       <div className={logoCss}>
-        <Image src="/logo.svg" height={52} width={52} alt="Logo" />
+        <Image src="/logo.svg" height={48} width={48} alt="Logo" />
         <div className={textCss}>Metrix</div>
       </div>
 
-      <div className={menuItemsCss}>
+      {/* Navigation */}
+      <nav className={menuItemsCss}>
         {NAVIGATION.map((item) => {
           const isActive = item.key === current;
           return (
@@ -32,13 +34,16 @@ function SidebarView({ current, onClick }: Props) {
             />
           );
         })}
-      </div>
+      </nav>
 
+      {/* Logout */}
       <div className={logOutCss}>
-        <Icon name="Logout" />
-        <div className={textLogoutCss}>Logout</div>
+        <div className={logoutInnerCss}>
+          <Icon name="Logout" />
+          <span className={textLogoutCss}>Đăng xuất</span>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -48,41 +53,56 @@ const containerCss = flex({
   flexDirection: 'column',
   alignItems: 'center',
   height: '100vh',
-  maxWidth: '296px',
-  width: '100%',
-  padding: '24px 0',
+  width: '260px',
+  padding: '28px 20px',
+  background: 'linear-gradient(180deg, #ffffff 0%, #f8faff 100%)',
+  borderRight: '1px solid token(colors.gray.30)',
+  boxShadow: '2px 0 6px rgba(0,0,0,0.04)',
 });
 
 const logoCss = flex({
   alignItems: 'center',
-  maxWidth: '233px',
+  justifyContent: 'flex-start',
   width: '100%',
-  paddingBottom: '62px',
+  marginBottom: '48px',
 });
 
 const textCss = css({
-  textStyle: 'sh3Bold',
-  marginLeft: '8px',
+  fontWeight: 700,
+  fontSize: '20px',
+  color: 'blue.100',
+  marginLeft: '10px',
 });
 
 const menuItemsCss = flex({
   flexDirection: 'column',
-  maxWidth: '233px',
+  gap: '6px',
   width: '100%',
-  gap: '8px',
+  flexGrow: 1,
 });
 
 const logOutCss = flex({
-  maxWidth: '233px',
   width: '100%',
-  alignItems: 'center',
-  gap: '8px',
   marginTop: 'auto',
-  cursor: 'pointer',
   paddingTop: '24px',
+  borderTop: '1px solid token(colors.gray.20)',
+});
+
+const logoutInnerCss = flex({
+  alignItems: 'center',
+  gap: '10px',
+  cursor: 'pointer',
+  padding: '12px 16px',
+  borderRadius: '10px',
+  color: 'black.70',
+  transition: 'all 0.2s ease',
+  _hover: {
+    backgroundColor: 'gray.10',
+    color: 'red.90',
+  },
 });
 
 const textLogoutCss = css({
-  textStyle: 'p2Regular',
-  color: 'red.100',
+  fontSize: '15px',
+  fontWeight: 500,
 });

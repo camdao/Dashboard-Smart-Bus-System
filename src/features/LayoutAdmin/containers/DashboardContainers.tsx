@@ -21,16 +21,22 @@ export default function Dashboard({ children }: DashboardProps) {
 
 const containerCss = css({
   display: 'flex',
-  height: '100vh',
+  minHeight: '100vh',
+  backgroundColor: 'white.100',
 });
 
 const mainContainer = css({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  backgroundColor: 'white',
+  borderLeft: '1px solid',
+  borderColor: 'gray.100',
 });
 
 const mainCss = css({
   flex: 1,
+  padding: '24px',
+  overflowY: 'auto',
   backgroundColor: 'white.50',
 });
