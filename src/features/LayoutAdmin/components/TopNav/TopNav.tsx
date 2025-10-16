@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { NAVIGATION } from '@/src/features/share/constants/navigation';
+import { NAVIGATION } from '@/features/share/constants/navigation';
 import { css } from '@/styled-system/css';
 
 const TopNav = () => {

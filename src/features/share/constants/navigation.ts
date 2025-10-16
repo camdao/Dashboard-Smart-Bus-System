@@ -16,7 +16,7 @@ export const NAVIGATION: NavigationItemType[] = [
     path: ROUTER.DASHBOARD,
   },
   {
-    icon: 'CategoryIcon',
+    icon: 'ScheduleIcon',
     key: 'calendar',
     name: 'Calendar',
     path: ROUTER.CALENDAR,

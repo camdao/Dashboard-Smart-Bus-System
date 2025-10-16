@@ -7,6 +7,7 @@ import EyeOffIcon from './EyeOffIcon';
 import LockIcon from './LockIcon';
 import Logout from './Logout';
 import MessageIcon from './MessageIcon';
+import ScheduleIcon from './ScheduleIcon';
 
 export const IconComponentMap = {
   message: MessageIcon,
@@ -15,6 +16,7 @@ export const IconComponentMap = {
   EyeIcon: EyeIcon,
   Logout: Logout,
   CategoryIcon: CategoryIcon,
+  ScheduleIcon: ScheduleIcon,
 } as const;
 
 interface Props extends IconComponentProps {

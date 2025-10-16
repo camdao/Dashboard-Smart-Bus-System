@@ -1,4 +1,4 @@
-import Dashboard from '../../share/ui/LayoutAdmin/containers/DashboardContainers';
+import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 
 export default function DashboardFeatures() {
   return (

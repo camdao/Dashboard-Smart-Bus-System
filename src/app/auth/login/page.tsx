@@ -1,4 +1,4 @@
-import { LoginFeature } from '@/src/features/login/ui/LoginFeature';
+import { LoginFeature } from '@/features/login/ui/LoginFeature';
 
 export default function loginPage() {
   return <LoginFeature />;
