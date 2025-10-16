@@ -5,30 +5,24 @@ import { css } from '@/styled-system/css';
 export default function CalendarFeatures() {
   return (
     <Dashboard>
-      <div className={container}>
-        <h1 className={title}>Lịch làm việc</h1>
+      <h1 className={title}>Lịch làm việc</h1>
 
-        <div className={statsGrid}>
-          <StatCard icon={<Icon name="EyeIcon" className={iconCss('blue.500')} />} label="Sự kiện hôm nay" value="5" />
-          <StatCard
-            icon={<Icon name="EyeIcon" className={iconCss('orange.500')} />}
-            label="Sự kiện sắp tới"
-            value="12"
-          />
-          <StatCard icon={<Icon name="EyeIcon" className={iconCss('green.500')} />} label="Đã hoàn thành" value="8" />
-        </div>
+      <div className={statsGrid}>
+        <StatCard icon={<Icon name="EyeIcon" className={iconCss('blue.500')} />} label="Sự kiện hôm nay" value="5" />
+        <StatCard icon={<Icon name="EyeIcon" className={iconCss('orange.500')} />} label="Sự kiện sắp tới" value="12" />
+        <StatCard icon={<Icon name="EyeIcon" className={iconCss('green.500')} />} label="Đã hoàn thành" value="8" />
+      </div>
 
-        <div className={contentBox}>
-          <h2 className={subTitle}>Lịch tổng quan</h2>
-          <p>
-            Đây là khu vực hiển thị lịch làm việc hoặc sự kiện trong hệ thống. Bạn có thể tích hợp thêm component lịch
-            (ví dụ <code>react-calendar</code> hoặc <code>fullcalendar</code>) vào khu vực này sau.
-          </p>
+      <div className={contentBox}>
+        <h2 className={subTitle}>Lịch tổng quan</h2>
+        <p>
+          Đây là khu vực hiển thị lịch làm việc hoặc sự kiện trong hệ thống. Bạn có thể tích hợp thêm component lịch (ví
+          dụ <code>react-calendar</code> hoặc <code>fullcalendar</code>) vào khu vực này sau.
+        </p>
 
-          <div className={calendarPlaceholder}>
-            <Icon name="EyeIcon" className={iconCss('gray.400')} />
-            <p>Hiện chưa có lịch — bạn có thể thêm mới hoặc kết nối API lịch.</p>
-          </div>
+        <div className={calendarPlaceholder}>
+          <Icon name="EyeIcon" className={iconCss('gray.400')} />
+          <p>Hiện chưa có lịch — bạn có thể thêm mới hoặc kết nối API lịch.</p>
         </div>
       </div>
     </Dashboard>
@@ -52,16 +46,6 @@ const StatCard = ({ icon, label, value }: StatCardProps) => {
     </div>
   );
 };
-
-// 🎨 Styles
-const container = css({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '32px',
-  backgroundColor: 'gray.50',
-  minHeight: '100vh',
-});
 
 const title = css({
   fontSize: '2xl',

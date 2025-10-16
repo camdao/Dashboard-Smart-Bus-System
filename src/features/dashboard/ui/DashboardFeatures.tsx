@@ -5,43 +5,40 @@ import { css } from '@/styled-system/css';
 export default function DashboardFeatures() {
   return (
     <Dashboard>
-      <div className={container}>
-        <h1 className={title}>Bảng điều khiển</h1>
+      <h1 className={title}>Bảng điều khiển</h1>
+      <div className={statsGrid}>
+        <StatCard
+          icon={<Icon name="EyeIcon" className={iconCss('blue.500')} />}
+          label="Người dùng"
+          value="1,254"
+          change="+12%"
+        />
+        <StatCard
+          icon={<Icon name="EyeIcon" className={iconCss('green.500')} />}
+          label="Doanh thu"
+          value="$8,420"
+          change="+8%"
+        />
+        <StatCard
+          icon={<Icon name="EyeIcon" className={iconCss('purple.500')} />}
+          label="Đơn hàng"
+          value="327"
+          change="+5%"
+        />
+        <StatCard
+          icon={<Icon name="EyeIcon" className={iconCss('orange.500')} />}
+          label="Lượt truy cập"
+          value="12,540"
+          change="+15%"
+        />
+      </div>
 
-        <div className={statsGrid}>
-          <StatCard
-            icon={<Icon name="EyeIcon" className={iconCss('blue.500')} />}
-            label="Người dùng"
-            value="1,254"
-            change="+12%"
-          />
-          <StatCard
-            icon={<Icon name="EyeIcon" className={iconCss('green.500')} />}
-            label="Doanh thu"
-            value="$8,420"
-            change="+8%"
-          />
-          <StatCard
-            icon={<Icon name="EyeIcon" className={iconCss('purple.500')} />}
-            label="Đơn hàng"
-            value="327"
-            change="+5%"
-          />
-          <StatCard
-            icon={<Icon name="EyeIcon" className={iconCss('orange.500')} />}
-            label="Lượt truy cập"
-            value="12,540"
-            change="+15%"
-          />
-        </div>
-
-        <div className={contentBox}>
-          <h2 className={subTitle}>Tổng quan hoạt động</h2>
-          <p>
-            Dưới đây là phần thống kê nhanh về hệ thống của bạn. Các chỉ số được cập nhật theo thời gian thực để giúp
-            bạn nắm bắt hiệu suất tổng thể.
-          </p>
-        </div>
+      <div className={contentBox}>
+        <h2 className={subTitle}>Tổng quan hoạt động</h2>
+        <p>
+          Dưới đây là phần thống kê nhanh về hệ thống của bạn. Các chỉ số được cập nhật theo thời gian thực để giúp bạn
+          nắm bắt hiệu suất tổng thể.
+        </p>
       </div>
     </Dashboard>
   );
@@ -66,16 +63,6 @@ const StatCard = ({ icon, label, value, change }: StatCardProps) => {
     </div>
   );
 };
-
-// 🧩 Styles
-const container = css({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '32px',
-  backgroundColor: 'gray.50',
-  minHeight: '100vh',
-});
 
 const title = css({
   fontSize: '2xl',
@@ -146,7 +133,6 @@ const subTitle = css({
   marginBottom: '12px',
 });
 
-// tiện helper nhỏ cho màu icon
 const iconCss = (color: string) =>
   css({
     width: '24px',

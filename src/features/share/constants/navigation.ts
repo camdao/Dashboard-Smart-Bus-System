@@ -21,4 +21,16 @@ export const NAVIGATION: NavigationItemType[] = [
     name: 'Calendar',
     path: ROUTER.CALENDAR,
   },
+  {
+    icon: 'MapIcon',
+    key: 'map',
+    name: 'Map',
+    path: ROUTER.MAP,
+  },
+  {
+    icon: 'ChatIcon',
+    key: 'chat',
+    name: 'Chat',
+    path: ROUTER.CHAT,
+  },
 ];

@@ -13,7 +13,9 @@ export default function Dashboard({ children }: DashboardProps) {
       <Sidebar />
       <div className={mainContainer}>
         <TopNav />
-        <div className={contentWrapper}>{children}</div>
+        <div className={contentWrapper}>
+          <div className={container}> {children}</div>
+        </div>
       </div>
     </div>
   );
@@ -40,4 +42,12 @@ const contentWrapper = css({
   overflowY: 'auto',
   padding: '24px',
   backgroundColor: 'white.50',
+});
+const container = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '32px',
+  backgroundColor: 'white',
+  minHeight: '100%',
 });

@@ -2,10 +2,12 @@ import { type SVGProps } from 'react';
 import { type ColorToken } from '@/styled-system/tokens';
 
 import CategoryIcon from './CategoryIcon';
+import ChatIcon from './ChatIcon';
 import EyeIcon from './EyeIcon';
 import EyeOffIcon from './EyeOffIcon';
 import LockIcon from './LockIcon';
 import Logout from './Logout';
+import MapIcon from './MapIcon';
 import MessageIcon from './MessageIcon';
 import ScheduleIcon from './ScheduleIcon';
 
@@ -17,6 +19,8 @@ export const IconComponentMap = {
   Logout: Logout,
   CategoryIcon: CategoryIcon,
   ScheduleIcon: ScheduleIcon,
+  ChatIcon: ChatIcon,
+  MapIcon: MapIcon,
 } as const;
 
 interface Props extends IconComponentProps {
