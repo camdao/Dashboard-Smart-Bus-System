@@ -1,6 +1,6 @@
 import { css, cx } from '@/styled-system/css';
 
-import Icon, { type IconComponentMap } from '../Icon';
+import Icon, { type IconComponentMap } from '../../../../../../components/Icon';
 
 interface NavItemProps {
   label: string;

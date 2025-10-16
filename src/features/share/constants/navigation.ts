@@ -1,4 +1,4 @@
-import { type IconComponentMap } from '../components/Icon';
+import { type IconComponentMap } from '../../../components/Icon';
 import { ROUTER } from './router';
 
 export interface NavigationItemType {
@@ -15,5 +15,10 @@ export const NAVIGATION: NavigationItemType[] = [
     name: 'Dashboard',
     path: ROUTER.DASHBOARD,
   },
-  
+  {
+    icon: 'CategoryIcon',
+    key: 'calendar',
+    name: 'Calendar',
+    path: ROUTER.CALENDAR,
+  },
 ];

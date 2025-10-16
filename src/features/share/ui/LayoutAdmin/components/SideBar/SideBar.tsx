@@ -1,5 +1,6 @@
+'use client';
 import { usePathname, useRouter } from 'next/navigation';
-import { NAVIGATION } from '@/src/constants/navigation';
+import { NAVIGATION } from '@/src/features/share/constants/navigation';
 
 import SidebarView from './SideBarView';
 

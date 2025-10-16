@@ -1,3 +1,5 @@
+import DashboardFeatures from '@/src/features/dashboard/ui/DashboardFeatures';
+
 export default function DashboardPage() {
-  return <div>Đây là trang Dashboard chính</div>;
+  return <DashboardFeatures />;
 }
