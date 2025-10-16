@@ -13,7 +13,7 @@ export default function Dashboard({ children }: DashboardProps) {
       <Sidebar />
       <div className={mainContainer}>
         <TopNav />
-        <div className={mainCss}>{children}</div>
+        <div className={contentWrapper}>{children}</div>
       </div>
     </div>
   );
@@ -21,8 +21,9 @@ export default function Dashboard({ children }: DashboardProps) {
 
 const containerCss = css({
   display: 'flex',
-  minHeight: '100vh',
+  height: '100vh',
   backgroundColor: 'white.100',
+  overflow: 'hidden',
 });
 
 const mainContainer = css({
@@ -34,9 +35,9 @@ const mainContainer = css({
   borderColor: 'gray.100',
 });
 
-const mainCss = css({
+const contentWrapper = css({
   flex: 1,
-  padding: '24px',
   overflowY: 'auto',
+  padding: '24px',
   backgroundColor: 'white.50',
 });
