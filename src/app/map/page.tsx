@@ -1,5 +1,5 @@
-import DashboardFeatures from "@/features/dashboard/ui/DashboardFeatures";
+import MapFeatures from '@/features/map/ui/MapFeatures';
 
 export default function DashboardPage() {
-  return <DashboardFeatures />;
+  return <MapFeatures />;
 }
