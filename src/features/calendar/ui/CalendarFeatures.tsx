@@ -123,8 +123,17 @@ export default function CalendarFeatures() {
               const mount = el.querySelector('.fc-add-btn-container') as HTMLElement | null;
               if (mount) {
                 const mountEl = mount as HTMLElement & { __fcRoot?: Root };
-                mountEl.__fcRoot?.unmount();
-                delete mountEl.__fcRoot;
+                const root = mountEl.__fcRoot;
+                if (root) {
+                  queueMicrotask(() => {
+                    try {
+                      root.unmount();
+                    } catch {
+                      // ignore unmount errors
+                    }
+                    delete mountEl.__fcRoot;
+                  });
+                }
               }
             }}
             height="100%"
