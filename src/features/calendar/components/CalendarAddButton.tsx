@@ -1,11 +1,13 @@
-import { css } from '@/styled-system/css';
-
-export default function CalendarAddButton({ onClick, className }: { onClick: () => void; className?: string }) {
-  const combined = className ? `${addBtn} ${className} fc-add-btn` : `${addBtn} fc-add-btn`;
+import { css, cx } from '@/styled-system/css';
+interface CalendarAddButtonProps {
+  onClick: () => void;
+  className?: string;
+}
+export default function CalendarAddButton({ onClick, className }: CalendarAddButtonProps) {
   return (
     <button
       type="button"
-      className={combined}
+      className={cx(addBtn, className)}
       tabIndex={0}
       aria-label="Thêm sự kiện mới"
       onClick={(e) => {
