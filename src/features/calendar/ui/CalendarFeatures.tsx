@@ -14,9 +14,9 @@ export default function CalendarFeatures() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [events, setEvents] = useState([
-    { title: 'Họp tuần', date: '2025-10-17' },
-    { title: 'Kiểm tra xe buýt', date: '2025-10-18' },
-    { title: 'Bảo trì định kỳ', date: '2025-10-20' },
+    { title: 'Xe 1', date: '2025-10-17' },
+    { title: 'Xe 2', date: '2025-10-18' },
+    { title: 'Xe 3', date: '2025-10-20' },
   ]);
 
   const handleAddEvent = (element: HTMLElement) => {
