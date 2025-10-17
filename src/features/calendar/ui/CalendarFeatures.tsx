@@ -4,10 +4,11 @@ import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import FullCalendar from '@fullcalendar/react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 
 import CalendarAddButton from '../components/CalendarAddButton';
 import EventFormDialog from '../components/EventFormDialog';
+import EventItem from '../components/EventItem';
 
 export default function CalendarFeatures() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -59,42 +60,34 @@ export default function CalendarFeatures() {
             titleFormat={{ year: 'numeric', month: 'long' }}
             buttonText={{ today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày' }}
             events={events}
-            eventContent={(eventInfo) => {
-              const wrapper = document.createElement('div');
-              wrapper.className = 'event-content';
-              wrapper.title = eventInfo.event.extendedProps?.description || '';
-
-              const title = document.createElement('div');
-              title.className = 'event-title';
-              title.textContent = eventInfo.event.title;
-
-              const delBtn = document.createElement('button');
-              delBtn.className = 'event-delete-btn';
-              delBtn.type = 'button';
-              delBtn.innerHTML = '🗑️';
-              delBtn.title = 'Xóa sự kiện';
-              delBtn.style.marginLeft = '8px';
-              delBtn.style.opacity = '0';
-              delBtn.style.transition = 'opacity 0.15s';
-              delBtn.onclick = (e) => {
-                e.stopPropagation();
-                eventInfo.event.remove();
+            eventDidMount={(info) => {
+              const el = info.el as HTMLElement & { __fcRoot?: Root };
+              if (el.__fcRoot) return;
+              const root = createRoot(el);
+              el.__fcRoot = root;
+              const remove = () => {
+                info.event.remove();
                 setEvents((prev) =>
-                  prev.filter((ev) => ev.title !== eventInfo.event.title || ev.date !== eventInfo.event.startStr),
+                  prev.filter((ev) => ev.title !== info.event.title || ev.date !== info.event.startStr),
                 );
               };
-
-              wrapper.appendChild(title);
-              wrapper.appendChild(delBtn);
-
-              wrapper.onmouseenter = () => {
-                delBtn.style.opacity = '1';
-              };
-              wrapper.onmouseleave = () => {
-                delBtn.style.opacity = '0';
-              };
-
-              return { domNodes: [wrapper] };
+              root.render(
+                <EventItem
+                  title={info.event.title}
+                  description={info.event.extendedProps?.description}
+                  onDelete={remove}
+                />,
+              );
+            }}
+            eventWillUnmount={(info) => {
+              const el = info.el as HTMLElement & { __fcRoot?: Root };
+              const root = el.__fcRoot;
+              if (root) {
+                setTimeout(() => {
+                  root.unmount();
+                  delete el.__fcRoot;
+                }, 0);
+              }
             }}
             eventClick={(info) => {
               info.jsEvent.preventDefault();
@@ -109,12 +102,23 @@ export default function CalendarFeatures() {
               const mount = document.createElement('div');
               mount.className = 'fc-add-btn-container';
               top.appendChild(mount);
-              createRoot(el).render(<CalendarAddButton onClick={() => handleAddEvent(el)} />);
+              const root = createRoot(mount);
+              const mountEl = mount as HTMLElement & { __fcRoot?: Root };
+              mountEl.__fcRoot = root;
+              root.render(<CalendarAddButton className="fc-add-btn" onClick={() => handleAddEvent(el)} />);
+            }}
+            dayCellWillUnmount={(info) => {
+              const el = info.el as HTMLElement;
+              const mount = el.querySelector('.fc-add-btn-container') as HTMLElement | null;
+              if (mount) {
+                const mountEl = mount as HTMLElement & { __fcRoot?: Root };
+                mountEl.__fcRoot?.unmount();
+                delete mountEl.__fcRoot;
+              }
             }}
             height="100%"
             firstDay={1}
           />
-          s
         </div>
       </div>
       <EventFormDialog
