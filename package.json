@@ -13,6 +13,10 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
     "@pandacss/dev": "^0.54.0",
     "next": "15.5.4",
     "prettier": "^3.6.2",

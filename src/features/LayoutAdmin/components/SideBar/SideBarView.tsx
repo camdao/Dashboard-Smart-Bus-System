@@ -54,7 +54,7 @@ const containerCss = flex({
   alignItems: 'center',
   height: '100vh',
   width: '260px',
-  padding: '28px 20px',
+  padding: '0 20px',
   background: 'linear-gradient(180deg, #ffffff 0%, #f8faff 100%)',
   borderRight: '1px solid token(colors.gray.30)',
   boxShadow: '2px 0 6px rgba(0,0,0,0.04)',
@@ -64,7 +64,7 @@ const logoCss = flex({
   alignItems: 'center',
   justifyContent: 'flex-start',
   width: '100%',
-  marginBottom: '48px',
+  height: '70px',
 });
 
 const textCss = css({
@@ -79,6 +79,7 @@ const menuItemsCss = flex({
   gap: '6px',
   width: '100%',
   flexGrow: 1,
+  paddingTop: '50px',
 });
 
 const logOutCss = flex({
@@ -86,6 +87,7 @@ const logOutCss = flex({
   marginTop: 'auto',
   paddingTop: '24px',
   borderTop: '1px solid token(colors.gray.20)',
+  paddingBottom: '30px',
 });
 
 const logoutInnerCss = flex({
