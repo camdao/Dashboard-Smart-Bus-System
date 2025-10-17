@@ -60,33 +60,44 @@ export default function CalendarFeatures() {
             titleFormat={{ year: 'numeric', month: 'long' }}
             buttonText={{ today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày' }}
             events={events}
-            eventDidMount={(info) => {
-              const el = info.el as HTMLElement & { __fcRoot?: Root };
-              if (el.__fcRoot) return;
-              const root = createRoot(el);
-              el.__fcRoot = root;
+            eventContent={(eventInfo) => {
+              const container = document.createElement('div');
+              container.className = 'fc-event-custom';
+              const root = createRoot(container);
+              (container as unknown as { __fcRoot?: Root }).__fcRoot = root;
+
               const remove = () => {
-                info.event.remove();
+                eventInfo.event.remove();
                 setEvents((prev) =>
-                  prev.filter((ev) => ev.title !== info.event.title || ev.date !== info.event.startStr),
+                  prev.filter((ev) => ev.title !== eventInfo.event.title || ev.date !== eventInfo.event.startStr),
                 );
               };
+
               root.render(
                 <EventItem
-                  title={info.event.title}
-                  description={info.event.extendedProps?.description}
+                  title={eventInfo.event.title}
+                  description={eventInfo.event.extendedProps?.description}
                   onDelete={remove}
                 />,
               );
+
+              return { domNodes: [container] };
             }}
             eventWillUnmount={(info) => {
-              const el = info.el as HTMLElement & { __fcRoot?: Root };
-              const root = el.__fcRoot;
-              if (root) {
-                setTimeout(() => {
-                  root.unmount();
-                  delete el.__fcRoot;
-                }, 0);
+              const mount = info.el.querySelector('.fc-event-custom') as HTMLElement | null;
+              if (mount) {
+                const mountEl = mount as HTMLElement & { __fcRoot?: Root };
+                const root = mountEl.__fcRoot;
+                if (root) {
+                  setTimeout(() => {
+                    try {
+                      root.unmount();
+                    } catch {
+                      // ignore
+                    }
+                    delete mountEl.__fcRoot;
+                  }, 0);
+                }
               }
             }}
             eventClick={(info) => {
