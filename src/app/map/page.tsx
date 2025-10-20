@@ -1,5 +1,11 @@
-import DashboardFeatures from "@/features/dashboard/ui/DashboardFeatures";
+'use client';
 
-export default function DashboardPage() {
-  return <DashboardFeatures />;
+import dynamic from 'next/dynamic';
+
+const MapFeatures = dynamic(() => import('@/features/map/ui/MapFeatures'), {
+  ssr: false,
+});
+
+export default function Page() {
+  return <MapFeatures />;
 }
