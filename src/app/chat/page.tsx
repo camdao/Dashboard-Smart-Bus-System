@@ -1,5 +1,5 @@
-import DashboardFeatures from "@/features/dashboard/ui/DashboardFeatures";
+import ChatFeatures from '@/features/chat/ui/ChatFeatures';
 
 export default function DashboardPage() {
-  return <DashboardFeatures />;
+  return <ChatFeatures />;
 }
