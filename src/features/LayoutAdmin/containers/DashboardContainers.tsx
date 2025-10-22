@@ -33,8 +33,7 @@ const mainContainer = css({
   flexDirection: 'column',
   flex: 1,
   backgroundColor: 'white',
-  borderLeft: '1px solid',
-  borderColor: 'gray.100',
+  boxShadow: '0 2px 10px rgba(15,23,42,0.04)',
 });
 
 const contentWrapper = css({
