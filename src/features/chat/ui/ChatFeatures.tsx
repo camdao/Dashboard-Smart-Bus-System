@@ -9,10 +9,10 @@ export default function ChatFeatures() {
     <Dashboard>
       <div className={layoutCss}>
         <div className={sidebarCss}>
-          <ChatSidebar />
+          <ChatSidebar width={340} searchPlaceholder="Search contacts..." />
         </div>
         <div className={chatWindowCss}>
-          <ChatWindow />
+          <ChatWindow title="Jane Doe" subtitle="Online · 12:55 am" />
         </div>
       </div>
     </Dashboard>

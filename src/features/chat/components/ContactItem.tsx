@@ -5,12 +5,21 @@ interface ContactItemProps {
   lastMessage?: string;
   time?: string;
   unread?: number;
+  selected?: boolean;
+  avatarSize?: number;
 }
 
-const ContactItem = ({ name, lastMessage, time = '12:55 am', unread = 0 }: ContactItemProps) => {
+const ContactItem = ({
+  name,
+  lastMessage,
+  time = '12:55 am',
+  unread = 0,
+  selected = false,
+  avatarSize = 48,
+}: ContactItemProps) => {
   return (
-    <div className={cx(containerCss)}>
-      <div className={avatarCss} aria-hidden />
+    <div className={cx(containerCss, selected && selectedCss)}>
+      <div className={avatarCss} style={{ width: avatarSize, height: avatarSize }} aria-hidden />
       <div className={contentCss}>
         <div className={rowCss}>
           <span className={nameCss}>{name}</span>
@@ -89,3 +98,5 @@ const badgeCss = css({
   padding: '4px 8px',
   borderRadius: '9999px',
 });
+
+const selectedCss = css({ backgroundColor: 'blue.50', borderLeft: '3px solid', borderColor: 'blue.400' });

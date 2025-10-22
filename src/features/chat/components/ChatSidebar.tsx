@@ -1,17 +1,23 @@
+import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
 import ContactItem from './ContactItem';
 
-const ChatSidebar = () => {
+interface ChatSidebarProps {
+  width?: number | string;
+  searchPlaceholder?: string;
+}
+
+const ChatSidebar = ({ width = '340px', searchPlaceholder = 'Search' }: ChatSidebarProps) => {
   return (
-    <aside className={sidebarCss}>
+    <aside className={sidebarCss} style={{ width }}>
       <div className={headerCss}>
         <h3 className={titleCss}>Contacts</h3>
         <span className={countCss}>34</span>
       </div>
 
       <div className={searchCss}>
-        <input placeholder="Search" className={searchInputCss} />
+        <Input placeholder={searchPlaceholder} />
       </div>
 
       <div className={listCss}>
@@ -45,14 +51,6 @@ const titleCss = css({ fontSize: '16px', fontWeight: 700 });
 const countCss = css({ fontSize: '13px', color: 'gray.400' });
 
 const searchCss = css({});
-const searchInputCss = css({
-  width: '100%',
-  padding: '12px 14px',
-  borderRadius: '10px',
-  border: '1px solid',
-  borderColor: 'gray.200',
-  backgroundColor: 'gray.50',
-});
 
 const listCss = css({
   overflowY: 'auto',

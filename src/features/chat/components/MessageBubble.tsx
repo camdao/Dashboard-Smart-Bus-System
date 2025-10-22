@@ -4,15 +4,25 @@ interface MessageBubbleProps {
   text: string;
   time?: string;
   fromSelf?: boolean;
+  maxWidth?: string | number;
+  showTimestamp?: boolean;
+  className?: string;
 }
 
-const MessageBubble = ({ text, time = '12:55 am', fromSelf = false }: MessageBubbleProps) => {
-  const bubbleClass = cx(bubbleBase, fromSelf ? selfBubbleCss : otherBubbleCss);
+const MessageBubble = ({
+  text,
+  time = '12:55 am',
+  fromSelf = false,
+  maxWidth = '72%',
+  showTimestamp = true,
+  className,
+}: MessageBubbleProps) => {
+  const bubbleClass = cx(bubbleBase, fromSelf ? selfBubbleCss : otherBubbleCss, className);
 
   return (
-    <div className={cx(wrapperCss, fromSelf ? selfCss : otherCss)}>
+    <div className={cx(wrapperCss, fromSelf ? selfCss : otherCss)} style={{ maxWidth }}>
       <div className={bubbleClass}>{text}</div>
-      <div className={timeCss}>{time}</div>
+      {showTimestamp && <div className={timeCss}>{time}</div>}
     </div>
   );
 };
@@ -22,11 +32,10 @@ export default MessageBubble;
 const wrapperCss = css({ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '72%' });
 
 const bubbleBase = css({
-  padding: '12px 16px',
-  borderRadius: '12px',
+  padding: '10px 14px',
+  borderRadius: '10px',
   fontSize: '14px',
   lineHeight: '20px',
-  boxShadow: '0 4px 16px rgba(15,23,42,0.03)',
 });
 
 const timeCss = css({ fontSize: '12px', color: 'gray.400', alignSelf: 'flex-end' });
@@ -35,5 +44,10 @@ const selfCss = css({ alignSelf: 'flex-end', textAlign: 'right', gap: '6px' });
 const otherCss = css({ alignSelf: 'flex-start' });
 
 // We'll apply color classes inline for clarity
-const selfBubbleCss = css({ backgroundColor: 'blue.500', color: 'white', borderTopRightRadius: '6px' });
-const otherBubbleCss = css({ backgroundColor: 'gray.100', color: 'black.100', borderTopLeftRadius: '6px' });
+const selfBubbleCss = css({
+  backgroundColor: 'blue.500',
+  color: 'white',
+  borderTopRightRadius: '8px',
+  boxShadow: '0 6px 18px rgba(74,108,247,0.08)',
+});
+const otherBubbleCss = css({ backgroundColor: 'gray.100', color: 'black.100', borderTopLeftRadius: '8px' });

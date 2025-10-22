@@ -1,3 +1,4 @@
+'use client';
 import { type InputHTMLAttributes, useState } from 'react';
 import { css, cx } from '@/styled-system/css';
 import { type Token, token } from '@/styled-system/tokens';
