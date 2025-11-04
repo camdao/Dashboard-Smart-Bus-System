@@ -18,6 +18,8 @@
     "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
     "@pandacss/dev": "^0.54.0",
+    "axios": "^1.13.1",
+    "cookies-next": "^4.3.0",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "next": "15.5.4",
