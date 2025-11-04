@@ -17,16 +17,19 @@
     "@fullcalendar/daygrid": "^6.1.19",
     "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
+    "@maplibre/maplibre-gl-directions": "^0.8.0",
     "@pandacss/dev": "^0.54.0",
     "axios": "^1.13.1",
     "cookies-next": "^4.3.0",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
+    "maplibre-gl": "^5.11.0",
     "next": "15.5.4",
     "prettier": "^3.6.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "react-map-gl": "^8.1.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
