@@ -1,10 +1,45 @@
 'use client';
+import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { handleAuth } from '@/app/auth/apis/getToken';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
 export function LoginFeature() {
+  const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!username || !password) {
+      setError('Please enter both username and password');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await handleAuth(username, password);
+
+      if (result.success) {
+        router.push('/dashboard');
+      } else {
+        setError(result.error || 'Login failed. Please try again.');
+      }
+    } catch {
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className={headerCss}>
@@ -12,7 +47,7 @@ export function LoginFeature() {
       </div>
       <main className={container}>
         <section className={formContainer}>
-          <div className={formCss}>
+          <form className={formCss} onSubmit={handleSubmit}>
             <div className={logoCss}>
               <Image src="/logo.svg" height={60} width={60} alt="Logo" />
               <div className={textGroup}>
@@ -21,15 +56,28 @@ export function LoginFeature() {
               </div>
             </div>
 
+            {error && (
+              <div className={errorCss}>
+                <span>{error}</span>
+              </div>
+            )}
+
             <div className={inputCss}>
-              <Input icon="message" placeholder="Username" />
-              <Input icon="lock" type="password" placeholder="Password" />
+              <Input icon="message" placeholder="Username" value={username} onChange={setUsername} disabled={loading} />
+              <Input
+                icon="lock"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={setPassword}
+                disabled={loading}
+              />
             </div>
 
-            <Button className={buttonCss} size="medium" variant="primary">
-              Login
+            <Button className={buttonCss} size="medium" variant="primary" type="submit" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
-          </div>
+          </form>
         </section>
       </main>
     </>
@@ -115,4 +163,16 @@ const textGroup = css({
   flexDirection: 'column',
   alignItems: 'center',
   gap: '4px',
+});
+
+const errorCss = css({
+  backgroundColor: 'red.50',
+  color: 'red.600',
+  padding: '12px 16px',
+  borderRadius: '8px',
+  fontSize: '14px',
+  textAlign: 'center',
+  marginBottom: '16px',
+  border: '1px solid',
+  borderColor: 'red.200',
 });

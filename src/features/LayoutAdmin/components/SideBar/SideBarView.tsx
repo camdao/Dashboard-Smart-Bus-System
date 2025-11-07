@@ -9,9 +9,10 @@ import NavItem from '../NavItem/NavItem';
 interface Props {
   current: string;
   onClick?: (item: (typeof NAVIGATION)[number]) => void;
+  onLogout?: () => void;
 }
 
-function SidebarView({ current, onClick }: Props) {
+function SidebarView({ current, onClick, onLogout }: Props) {
   return (
     <aside className={containerCss}>
       {/* Logo */}
@@ -38,7 +39,7 @@ function SidebarView({ current, onClick }: Props) {
 
       {/* Logout */}
       <div className={logOutCss}>
-        <div className={logoutInnerCss}>
+        <div className={logoutInnerCss} onClick={onLogout}>
           <Icon name="Logout" />
           <span className={textLogoutCss}>Đăng xuất</span>
         </div>

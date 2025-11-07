@@ -1,5 +1,6 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
+import { logout } from '@/features/LayoutAdmin/hooks/logout';
 import { NAVIGATION } from '@/features/share/constants/navigation';
 
 import SidebarView from './SideBarView';
@@ -14,7 +15,12 @@ function Sidebar() {
     router.push(item.path);
   };
 
-  return <SidebarView current={current} onClick={handleClick} />;
+  const handleLogout = async () => {
+    await logout();
+    router.push('/auth/login');
+  };
+
+  return <SidebarView current={current} onClick={handleClick} onLogout={handleLogout} />;
 }
 
 export default Sidebar;
