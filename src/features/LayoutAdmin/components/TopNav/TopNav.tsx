@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { NAVIGATION } from '@/features/share/constants/navigation';
+import { NAVIGATION } from '@/constants/navigation';
 import { css } from '@/styled-system/css';
 
 const TopNav = () => {
@@ -22,7 +22,7 @@ const topNavStyles = css({
   height: '70px',
   padding: '0 28px',
   borderBottom: '1px solid ',
-  borderBottomColor:'gray.50',
+  borderBottomColor: 'gray.50',
   backgroundColor: 'white',
   position: 'sticky',
   top: 0,

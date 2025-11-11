@@ -1,7 +1,7 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '@/features/LayoutAdmin/hooks/logout';
-import { NAVIGATION } from '@/features/share/constants/navigation';
+import { NAVIGATION } from '@/constants/navigation';
 
 import SidebarView from './SideBarView';
 

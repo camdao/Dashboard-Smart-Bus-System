@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Icon from '@/components/Icon';
-import { NAVIGATION } from '@/features/share/constants/navigation';
+import { NAVIGATION } from '@/constants/navigation';
 import { css } from '@/styled-system/css';
 import { flex } from '@/styled-system/patterns/flex';
 

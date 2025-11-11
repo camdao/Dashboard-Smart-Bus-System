@@ -7,10 +7,9 @@ import { setCookie } from 'cookies-next';
 
 import { type AuthDto, type LoginPayloadDto } from '../types/auth';
 
-export async function login(username: string, password: string): Promise<AuthDto> {
+export async function login(payload: LoginPayloadDto): Promise<AuthDto> {
   try {
-    const requestBody = { username, password };
-    const data = await client.post<LoginPayloadDto, AuthDto>(`${CLIENT_SIDE_URL}/auth/login`, requestBody);
+    const data = await client.post<LoginPayloadDto, AuthDto>(`${CLIENT_SIDE_URL}/auth/login`, payload);
     return data;
   } catch (error) {
     console.error(error);
@@ -20,7 +19,7 @@ export async function login(username: string, password: string): Promise<AuthDto
 
 export async function handleAuth(username: string, password: string) {
   try {
-    const tokenData: AuthDto = await login(username, password);
+    const tokenData: AuthDto = await login({ username, password });
 
     setCookie('accessToken', tokenData.data.data.accessToken);
     setCookie('refreshToken', tokenData.data.data.refreshToken);

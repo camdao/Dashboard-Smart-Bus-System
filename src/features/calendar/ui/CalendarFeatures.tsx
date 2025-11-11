@@ -9,15 +9,23 @@ import { createRoot, type Root } from 'react-dom/client';
 import CalendarAddButton from '../components/CalendarAddButton';
 import EventFormDialog from '../components/EventFormDialog';
 import EventItem from '../components/EventItem';
+import { getScheduleById } from '../hooks/api';
+import { useResourcesQuery } from '../hooks/useResourcesQuery';
+import { type ScheduleRequest, useSchedule } from '../hooks/useSchedule';
 
 export default function CalendarFeatures() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [events, setEvents] = useState([
-    { title: 'Xe 1', date: '2025-10-17' },
-    { title: 'Xe 2', date: '2025-10-18' },
-    { title: 'Xe 3', date: '2025-10-20' },
-  ]);
+  const { events, loading, error, addSchedule, removeSchedule } = useSchedule();
+  const { routes, drivers, buses } = useResourcesQuery();
+  const [initialValues, setInitialValues] = useState<{
+    routerId: number;
+    driverId?: number | null;
+    busId: number;
+    scheduleDate: string;
+    startTime: string;
+    endTime: string;
+  } | null>(null);
 
   const handleAddEvent = (element: HTMLElement) => {
     const dayCell = element.closest('.fc-daygrid-day');
@@ -25,27 +33,54 @@ export default function CalendarFeatures() {
       const date = dayCell.dataset.date;
       if (date) {
         setSelectedDate(date);
+        setInitialValues(null);
         setIsDialogOpen(true);
       }
     }
   };
 
-  const handleEventSubmit = (eventData: { title: string; description: string }) => {
-    const newEvent = {
-      title: eventData.title,
-      date: selectedDate,
-      extendedProps: {
-        description: eventData.description,
-      },
-    };
-
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
-    console.log('Saving event:', newEvent);
+  const handleEventSubmit = async (eventData: ScheduleRequest) => {
+    try {
+      await addSchedule(eventData);
+      setIsDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to create schedule:', err);
+    }
   };
+
+  const handleDeleteEvent = async (eventId: number) => {
+    try {
+      await removeSchedule(eventId);
+    } catch (err) {
+      console.error('Failed to delete schedule:', err);
+    }
+  };
+
+  const fullCalendarEvents = events.map(
+    (event: {
+      id: number;
+      title: string;
+      date: string;
+      description?: string;
+      startTime?: string;
+      endTime?: string;
+    }) => ({
+      id: String(event.id),
+      title: event.title,
+      date: event.date,
+      extendedProps: {
+        description: event.description,
+        eventId: event.id,
+        startTime: event.startTime,
+        endTime: event.endTime,
+      },
+    }),
+  );
 
   return (
     <Dashboard>
       <h1 className={title}>Lịch làm việc</h1>
+      {error && <div className={errorBanner}>{error}</div>}
       <div className={contentBox}>
         <div className={calendarContainer}>
           <FullCalendar
@@ -59,23 +94,35 @@ export default function CalendarFeatures() {
             }}
             titleFormat={{ year: 'numeric', month: 'long' }}
             buttonText={{ today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày' }}
-            events={events}
+            events={fullCalendarEvents}
+            loading={(isLoading) => {
+              if (isLoading || loading) {
+                console.log('Loading calendar events...');
+              }
+            }}
             eventContent={(eventInfo) => {
               const container = document.createElement('div');
               container.className = 'fc-event-custom';
               const root = createRoot(container);
               (container as unknown as { __fcRoot?: Root }).__fcRoot = root;
 
+              const eventId = eventInfo.event.extendedProps?.eventId as number | undefined;
+
               const remove = () => {
+                if (eventId) {
+                  handleDeleteEvent(eventId);
+                }
                 eventInfo.event.remove();
-                setEvents((prev) =>
-                  prev.filter((ev) => ev.title !== eventInfo.event.title || ev.date !== eventInfo.event.startStr),
-                );
               };
+
+              const start = (eventInfo.event.extendedProps?.startTime as string) || '';
+              const end = (eventInfo.event.extendedProps?.endTime as string) || '';
+              const timeLabel =
+                start && end ? `${start.replace(/:00$/, '')} - ${end.replace(/:00$/, '')}` : eventInfo.event.title;
 
               root.render(
                 <EventItem
-                  title={eventInfo.event.title}
+                  title={timeLabel}
                   description={eventInfo.event.extendedProps?.description}
                   onDelete={remove}
                 />,
@@ -93,18 +140,44 @@ export default function CalendarFeatures() {
                     try {
                       root.unmount();
                     } catch {
-                      // ignore
+                      //
                     }
                     delete mountEl.__fcRoot;
                   }, 0);
                 }
               }
             }}
-            eventClick={(info) => {
+            eventClick={async (info) => {
               info.jsEvent.preventDefault();
               info.jsEvent.stopPropagation();
-              setSelectedDate(info.event.startStr);
-              setIsDialogOpen(true);
+              // Try to fetch schedule details from server if available
+              const eventId = info.event.extendedProps?.eventId as number | undefined;
+              if (!eventId) {
+                setSelectedDate(info.event.startStr);
+                setInitialValues(null);
+                setIsDialogOpen(true);
+                return;
+              }
+
+              try {
+                const detail = await getScheduleById(Number(eventId));
+                // pass raw times (may be HH:mm:ss) so dialog can normalize safely
+                setInitialValues({
+                  routerId: detail.router.id,
+                  driverId: detail.driver?.id ?? null,
+                  busId: detail.bus.id,
+                  scheduleDate: detail.scheduleDate,
+                  startTime: detail.startTime,
+                  endTime: detail.endTime,
+                });
+                setSelectedDate(detail.scheduleDate);
+                setIsDialogOpen(true);
+              } catch (err) {
+                console.error('Failed to load schedule detail:', err);
+                setSelectedDate(info.event.startStr);
+                setInitialValues(null);
+                setIsDialogOpen(true);
+              }
             }}
             dayCellDidMount={(info) => {
               const el = info.el as HTMLElement;
@@ -146,6 +219,10 @@ export default function CalendarFeatures() {
         onClose={() => setIsDialogOpen(false)}
         onSubmit={handleEventSubmit}
         selectedDate={selectedDate}
+        initialValues={initialValues}
+        routes={routes.map((r: { id: number; title: string }) => ({ id: r.id, name: r.title }))}
+        drivers={drivers.map((d: { id: number; title: string }) => ({ id: d.id, name: d.title }))}
+        buses={buses.map((b: { id: number; title: string }) => ({ id: b.id, plate: b.title }))}
       />
     </Dashboard>
   );
@@ -156,6 +233,17 @@ const title = css({
   color: 'gray.800',
   marginBottom: '24px',
   paddingLeft: '16px',
+});
+
+const errorBanner = css({
+  backgroundColor: 'red.50',
+  color: 'red.700',
+  padding: '12px 16px',
+  borderRadius: '8px',
+  marginBottom: '16px',
+  border: '1px solid',
+  borderColor: 'red.200',
+  textAlign: 'center',
 });
 
 const contentBox = css({
