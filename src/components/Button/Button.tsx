@@ -11,53 +11,81 @@ export const buttonStyle = cva({
     textAlign: 'center',
     userSelect: 'none',
     cursor: 'pointer',
-    transition: 'all 0.25s ease',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    border: 'none',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+
+    _hover: {
+      opacity: 0.9,
+      transform: 'translateY(-1px)',
+    },
+
     _active: {
       transform: 'translateY(0)',
-      boxShadow: '0 3px 8px rgba(0,0,0,0.08)',
       opacity: 1,
+    },
+
+    _disabled: {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+      transform: 'none',
     },
   },
   variants: {
     size: {
       small: {
-        height: '42px',
-        padding: '0 18px',
-        borderRadius: '10px',
+        height: '38px',
+        padding: '0 20px',
+        borderRadius: '8px',
+        textStyle: 'p2Medium',
       },
       medium: {
-        height: '52px',
-        padding: '0 40px',
-        borderRadius: '12px',
+        height: '44px',
+        padding: '0 30px',
+        borderRadius: '10px',
+        textStyle: 'p1Medium',
       },
       large: {
-        height: '58px',
-        padding: '0 24px',
+        height: '52px',
+        padding: '0 36px',
         width: '100%',
-        borderRadius: '14px',
+        borderRadius: '12px',
+        textStyle: 'p1Bold',
       },
     },
     variant: {
       primary: {
-        background: 'linear-gradient(90deg, #4A6CF7 0%, #5C89FF 100%)',
+        background: 'linear-gradient(135deg, #4A6CF7 0%, #5C89FF 100%)',
         color: 'white',
+        boxShadow: '0 2px 8px rgba(74, 108, 247, 0.25)',
+        _hover: {
+          boxShadow: '0 4px 12px rgba(74, 108, 247, 0.35)',
+        },
       },
       secondary: {
-        background: 'linear-gradient(90deg, #F44E77 0%, #FF6A88 100%)',
+        background: '#6B7280',
         color: 'white',
+        boxShadow: '0 2px 8px rgba(107, 114, 128, 0.2)',
+        _hover: {
+          background: '#4B5563',
+          boxShadow: '0 4px 12px rgba(107, 114, 128, 0.3)',
+        },
       },
       cta: {
-        background: 'linear-gradient(90deg, #00C897 0%, #00E6A6 100%)',
+        background: 'linear-gradient(135deg, #00C897 0%, #00E6A6 100%)',
         color: 'white',
+        boxShadow: '0 2px 8px rgba(0, 200, 151, 0.25)',
+        _hover: {
+          boxShadow: '0 4px 12px rgba(0, 200, 151, 0.35)',
+        },
       },
       primaryStroke: {
         background: 'transparent',
         color: '#4A6CF7',
         border: '2px solid #4A6CF7',
+        boxShadow: 'none',
         _hover: {
-          background: '#4A6CF7',
-          color: 'white',
+          background: 'rgba(74, 108, 247, 0.05)',
         },
       },
     },
