@@ -1,29 +1,29 @@
 'use client';
 
 import { client } from '@/apis/client';
+import { CLIENT_SIDE_URL } from '@/constants';
 import { AxiosError } from 'axios';
 import { setCookie } from 'cookies-next';
 
-interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-}
+import { type AuthDto, type LoginPayloadDto } from '../types/auth';
 
-export async function login(username: string, password: string) {
-  const response = await client.post<{ username: string; password: string }, { data: TokenData }>('/auth/login', {
-    username,
-    password,
-  });
-
-  return response.data;
+export async function login(username: string, password: string): Promise<AuthDto> {
+  try {
+    const requestBody = { username, password };
+    const data = await client.post<LoginPayloadDto, AuthDto>(`${CLIENT_SIDE_URL}/auth/login`, requestBody);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function handleAuth(username: string, password: string) {
   try {
-    const tokenData: TokenData = await login(username, password);
+    const tokenData: AuthDto = await login(username, password);
 
-    setCookie('accessToken', tokenData.accessToken);
-    setCookie('refreshToken', tokenData.refreshToken);
+    setCookie('accessToken', tokenData.data.data.accessToken);
+    setCookie('refreshToken', tokenData.data.data.refreshToken);
 
     return { success: true };
   } catch (error: unknown) {

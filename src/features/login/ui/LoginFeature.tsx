@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { handleAuth } from '@/app/auth/apis/getToken';
+import { handleAuth } from '@/features/login/apis/getToken';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
