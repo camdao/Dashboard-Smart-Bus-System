@@ -1,3 +1,4 @@
+import { TrashIcon } from '@/components/Icon/TrashIcon';
 import { css } from '@/styled-system/css';
 
 export default function EventItem({
@@ -25,7 +26,7 @@ export default function EventItem({
           onDelete();
         }}
       >
-        🗑️
+        <TrashIcon width={16} height={16} />
       </button>
     </div>
   );

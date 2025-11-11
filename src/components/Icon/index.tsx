@@ -10,6 +10,7 @@ import Logout from './Logout';
 import MapIcon from './MapIcon';
 import MessageIcon from './MessageIcon';
 import ScheduleIcon from './ScheduleIcon';
+import { TrashIcon } from './TrashIcon';
 
 export const IconComponentMap = {
   message: MessageIcon,
@@ -21,6 +22,7 @@ export const IconComponentMap = {
   ScheduleIcon: ScheduleIcon,
   ChatIcon: ChatIcon,
   MapIcon: MapIcon,
+  TrashIcon: TrashIcon,
 } as const;
 
 interface Props extends IconComponentProps {
