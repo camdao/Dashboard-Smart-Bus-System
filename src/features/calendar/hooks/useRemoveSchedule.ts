@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { deleteSchedule } from '@/features/calendar/hooks/api';
 
-/**
- * Hook chuyên dùng để xóa schedule
- * Trả về hàm removeSchedule và loading/error state
- */
 export function useRemoveSchedule() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

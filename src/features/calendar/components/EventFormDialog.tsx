@@ -3,44 +3,25 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/Button/Button';
 import { css } from '@/styled-system/css';
 
-interface RouteOption {
-  id: string | number;
-  name: string;
-}
-
-interface DriverOption {
-  id: string | number;
-  name: string;
-}
-
-interface BusOption {
-  id: string | number;
-  plate: string;
-}
+import { type ScheduleRequest } from '../types/scheduleTypes';
 
 interface EventFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (eventData: {
-    routerId: number;
-    driverId: number;
-    busId: number;
-    scheduleDate: string;
-    startTime: string;
-    endTime: string;
-  }) => void | Promise<void>;
+  onSubmit: (data: ScheduleRequest) => Promise<void>;
   selectedDate: string;
-  routes?: RouteOption[];
-  drivers?: DriverOption[];
-  buses?: BusOption[];
   initialValues?: {
     routerId: number;
     driverId?: number | null;
     busId: number;
-    scheduleDate: string; // YYYY-MM-DD
-    startTime: string; // HH:mm or HH:mm:ss
-    endTime: string; // HH:mm or HH:mm:ss
+    scheduleDate: string;
+    startTime: string;
+    endTime: string;
   } | null;
+  isEditing?: boolean;
+  routes: Array<{ id: number; name: string }>;
+  drivers: Array<{ id: number; name: string }>;
+  buses: Array<{ id: number; plate: string }>;
 }
 
 export default function EventFormDialog({
@@ -48,10 +29,11 @@ export default function EventFormDialog({
   onClose,
   onSubmit,
   selectedDate,
-  routes = [],
-  drivers = [],
-  buses = [],
-  initialValues = null,
+  initialValues,
+  isEditing = false,
+  routes,
+  drivers,
+  buses,
 }: EventFormDialogProps) {
   const [routeId, setRouteId] = useState<string | number | ''>('');
   const [driverId, setDriverId] = useState<string | number | ''>('');
@@ -59,8 +41,9 @@ export default function EventFormDialog({
   const [startDateTime, setStartDateTime] = useState<string>('');
   const [endDateTime, setEndDateTime] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   useEffect(() => {
-    // If editing (initialValues provided) and dialog opened, prefill with those values
     if (initialValues && isOpen) {
       const sRaw = initialValues.startTime || '';
       const eRaw = initialValues.endTime || '';
@@ -117,6 +100,8 @@ export default function EventFormDialog({
       return;
     }
 
+    setIsSubmitting(true);
+
     // Extract date and time
     const scheduleDate = startDateTime.split('T')[0]; // YYYY-MM-DD
     const startTime = startDateTime.split('T')[1]; // HH:mm
@@ -129,14 +114,22 @@ export default function EventFormDialog({
       scheduleDate,
       startTime,
       endTime,
-    });
-
-    setRouteId('');
-    setDriverId('');
-    setBusId('');
-    setStartDateTime(selectedDate ? `${selectedDate}T09:00` : '');
-    setEndDateTime(selectedDate ? `${selectedDate}T10:00` : '');
-    onClose();
+    })
+      .then(() => {
+        setRouteId('');
+        setDriverId('');
+        setBusId('');
+        setStartDateTime(selectedDate ? `${selectedDate}T09:00` : '');
+        setEndDateTime(selectedDate ? `${selectedDate}T10:00` : '');
+        onClose();
+      })
+      .catch((err) => {
+        setError('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+        console.error(err);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
 
   if (!isOpen) return null;
@@ -144,7 +137,7 @@ export default function EventFormDialog({
   return (
     <div className={overlay}>
       <div className={modal}>
-        <h2 className={modalTitle}>Thêm lịch trình mới</h2>
+        <h2 className={modalTitle}>{isEditing ? 'Cập nhật lịch trình' : 'Thêm lịch trình mới'}</h2>
         <p className={dateText}>Ngày: {selectedDate}</p>
 
         <form onSubmit={handleSubmit}>
@@ -226,8 +219,8 @@ export default function EventFormDialog({
             <Button variant="secondary" size="small" onClick={onClose} type="button">
               Hủy
             </Button>
-            <Button variant="primary" size="small" type="submit">
-              Lưu
+            <Button variant="primary" size="small" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (isEditing ? 'Đang cập nhật...' : 'Đang tạo...') : isEditing ? 'Cập nhật' : 'Lưu'}
             </Button>
           </div>
         </form>

@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { getBuses, getDrivers, getRoutes } from './api';
 
-// Query Keys
 const RESOURCE_QUERY_KEYS = {
   all: ['resources'] as const,
   routes: () => [...RESOURCE_QUERY_KEYS.all, 'routes'] as const,
@@ -10,16 +9,14 @@ const RESOURCE_QUERY_KEYS = {
   buses: () => [...RESOURCE_QUERY_KEYS.all, 'buses'] as const,
 };
 
-/**
- * Normalize resource data - backend có thể trả về nhiều format khác nhau
- */
+
 function normalizeResource(item: unknown) {
   const resource = item as Record<string, unknown>;
   return {
     id: (resource.id || resource.routeId || resource.driverId || resource.busId) as number,
     title: (resource.title ||
       resource.name ||
-      resource.username || // Fix: thêm username cho drivers
+      resource.username || 
       resource.routeName ||
       resource.routerName ||
       resource.driverName ||
@@ -30,9 +27,7 @@ function normalizeResource(item: unknown) {
 
 // ==================== Query Hooks ====================
 
-/**
- * Hook fetch routes với data normalization
- */
+
 export function useRoutesQuery() {
   return useQuery({
     queryKey: RESOURCE_QUERY_KEYS.routes(),
@@ -45,9 +40,7 @@ export function useRoutesQuery() {
   });
 }
 
-/**
- * Hook fetch drivers với data normalization
- */
+
 export function useDriversQuery() {
   return useQuery({
     queryKey: RESOURCE_QUERY_KEYS.drivers(),
@@ -60,9 +53,7 @@ export function useDriversQuery() {
   });
 }
 
-/**
- * Hook fetch buses với data normalization
- */
+
 export function useBusesQuery() {
   return useQuery({
     queryKey: RESOURCE_QUERY_KEYS.buses(),
@@ -77,9 +68,7 @@ export function useBusesQuery() {
 
 // ==================== Composed Hook ====================
 
-/**
- * Hook tổng hợp - fetch tất cả resources một lúc
- */
+
 export function useResourcesQuery() {
   const routesQuery = useRoutesQuery();
   const driversQuery = useDriversQuery();
@@ -103,9 +92,7 @@ export function useResourcesQuery() {
   };
 }
 
-/**
- * Hook để prefetch resources - useful for preloading data
- */
+
 export function usePrefetchResources() {
   const queryClient = useQueryClient();
 

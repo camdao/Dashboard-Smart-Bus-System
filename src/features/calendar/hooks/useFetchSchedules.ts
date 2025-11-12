@@ -1,36 +1,31 @@
-import { useEffect, useState } from 'react';
-import { getSchedules } from '@/features/calendar/hooks/api';
-import type { CalendarEvent } from '@/features/calendar/types/scheduleTypes';
+import { useMemo } from 'react';
+import { useGetSchedules } from '@/features/calendar/hooks/api';
+import type { ScheduleResponse } from '@/features/calendar/types/scheduleTypes';
 import { mapScheduleToEvent } from '@/features/calendar/utils/mapSchedule';
 
+type ApiResponse = ScheduleResponse[] | { data: ScheduleResponse[] };
+
 export function useFetchSchedules() {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: schedules = [], isLoading: loading, error: queryError, refetch } = useGetSchedules();
 
-  const fetchSchedules = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const schedules = await getSchedules();
-      setEvents(schedules.map(mapScheduleToEvent));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Không thể tải lịch làm việc';
-      setError(errorMessage);
-      console.error('Error fetching schedules:', err);
-    } finally {
-      setLoading(false);
+  const unwrappedSchedules = useMemo(() => {
+    const response = schedules as ApiResponse;
+
+    if (Array.isArray(response)) return response;
+    if (response && typeof response === 'object' && 'data' in response) {
+      return Array.isArray(response.data) ? response.data : [];
     }
-  };
+    return [];
+  }, [schedules]);
 
-  useEffect(() => {
-    void fetchSchedules();
-  }, []);
+  const events = useMemo(() => unwrappedSchedules.map(mapScheduleToEvent), [unwrappedSchedules]);
+
+  const error = queryError ? (queryError instanceof Error ? queryError.message : 'Không thể tải lịch làm việc') : null;
 
   return {
     events,
     loading,
     error,
-    refetch: fetchSchedules,
+    refetch,
   };
 }

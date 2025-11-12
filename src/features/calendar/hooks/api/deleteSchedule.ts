@@ -3,10 +3,6 @@ import { CLIENT_SIDE_URL } from '@/constants';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-/**
- * Xóa schedule
- * @param id - ID của schedule cần xóa
- */
 export const deleteSchedule = async (id: number): Promise<void> => {
   try {
     await client.delete(`${CLIENT_SIDE_URL}/schedules/${id}`);
