@@ -9,6 +9,7 @@ interface MessageInputProps {
   placeholder?: string;
   buttonVariant?: 'primary' | 'secondary' | 'primaryStroke' | 'cta';
   compact?: boolean;
+  disabled?: boolean;
 }
 
 const MessageInput = ({
@@ -16,11 +17,12 @@ const MessageInput = ({
   placeholder = 'Write a message...',
   buttonVariant = 'primary',
   compact = false,
+  disabled = false,
 }: MessageInputProps) => {
   const [value, setValue] = useState('');
 
   const handleSend = () => {
-    if (!value.trim()) return;
+    if (!value.trim() || disabled) return;
     onSend?.(value.trim());
     setValue('');
   };
@@ -28,11 +30,16 @@ const MessageInput = ({
   return (
     <div className={inputWrapCss}>
       <div className={inputContainerCss}>
-        <Input value={value} onChange={setValue} placeholder={placeholder} />
+        <Input value={value} onChange={setValue} placeholder={placeholder} disabled={disabled} />
       </div>
 
       <div className={actionsCss}>
-        <Button variant={buttonVariant} size={compact ? 'small' : 'small'} onClick={handleSend}>
+        <Button
+          variant={buttonVariant}
+          size={compact ? 'small' : 'small'}
+          onClick={handleSend}
+          disabled={disabled || !value.trim()}
+        >
           Send
         </Button>
       </div>
