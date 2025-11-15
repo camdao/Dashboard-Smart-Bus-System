@@ -9,7 +9,6 @@ import { createRoot, type Root } from 'react-dom/client';
 import CalendarAddButton from '../components/CalendarAddButton';
 import EventFormDialog from '../components/EventFormDialog';
 import EventItem from '../components/EventItem';
-import { useGetScheduleById } from '../hooks/queries/getScheduleById';
 import { useResourcesQuery } from '../hooks/useResourcesQuery';
 import { useSchedule } from '../hooks/useSchedule';
 import { type ScheduleRequest } from '../types/scheduleTypes';
@@ -18,8 +17,11 @@ export default function CalendarFeatures() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
-  const { events, loading, addSchedule, removeSchedule, updateSchedule } = useSchedule();
+
+  const { events, loading, createMutation, updateMutation, deleteMutation, useGetScheduleById } = useSchedule();
+
   const { routes, drivers, buses } = useResourcesQuery();
+
   const [initialValues, setInitialValues] = useState<{
     routerId: number;
     driverId?: number | null;
@@ -30,17 +32,16 @@ export default function CalendarFeatures() {
   } | null>(null);
 
   // ===== CREATE EVENT =====
-
   const handleCreateEvent = async (eventData: ScheduleRequest) => {
     try {
-      await addSchedule(eventData);
+      await createMutation.mutateAsync(eventData);
       closeDialog();
     } catch (err) {
       console.error('Failed to create schedule:', err);
     }
   };
 
-  // ===== EDIT EVENT STATE & HOOK =====
+  // ===== EDIT EVENT =====
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   const { data: eventDetail, isLoading: isLoadingDetail } = useGetScheduleById(selectedEventId ?? 0, {
@@ -66,20 +67,19 @@ export default function CalendarFeatures() {
       });
       setSelectedDate(eventDetail.scheduleDate);
       setIsDialogOpen(true);
-      setSelectedEventId(null); 
+      setSelectedEventId(null);
     }
   }, [eventDetail, selectedEventId]);
 
-  // ===== EDIT EVENT =====
   const handleEditEvent = (eventId: number) => {
-    setSelectedEventId(eventId); 
+    setSelectedEventId(eventId);
   };
 
   const handleUpdateEvent = async (eventData: ScheduleRequest) => {
     if (!editingEventId) return;
 
     try {
-      await updateSchedule(editingEventId, eventData);
+      await updateMutation.mutateAsync({ id: editingEventId, data: eventData });
       closeDialog();
     } catch (err) {
       console.error('Failed to update schedule:', err);
@@ -89,7 +89,7 @@ export default function CalendarFeatures() {
   // ===== DELETE EVENT =====
   const handleDeleteEvent = async (eventId: number) => {
     try {
-      await removeSchedule(eventId);
+      await deleteMutation.mutateAsync(eventId); 
     } catch (err) {
       console.error('Failed to delete schedule:', err);
     }
@@ -192,18 +192,19 @@ export default function CalendarFeatures() {
             }}
             eventWillUnmount={(info) => {
               const mount = info.el.querySelector('.fc-event-custom') as HTMLElement | null;
-              if (mount) {
+              if (mount && document.contains(mount)) {
                 const mountEl = mount as HTMLElement & { __fcRoot?: Root };
                 const root = mountEl.__fcRoot;
                 if (root) {
-                  setTimeout(() => {
+                  queueMicrotask(() => {
                     try {
                       root.unmount();
                     } catch {
-                      //
+                      // ignore
+                    } finally {
+                      delete mountEl.__fcRoot;
                     }
-                    delete mountEl.__fcRoot;
-                  }, 0);
+                  });
                 }
               }
             }}
@@ -213,7 +214,7 @@ export default function CalendarFeatures() {
 
               const eventId = info.event.extendedProps?.eventId as number | undefined;
               if (eventId) {
-                handleEditEvent(eventId); // ✅ Không await
+                handleEditEvent(eventId);
               } else {
                 openCreateDialog(info.event.startStr);
               }
@@ -249,7 +250,7 @@ export default function CalendarFeatures() {
                     try {
                       root.unmount();
                     } catch {
-                      // ignore unmount errors
+                      // ignore
                     }
                     delete mountEl.__fcRoot;
                   });
