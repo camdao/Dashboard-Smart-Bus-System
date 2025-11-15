@@ -2,73 +2,176 @@ import { useState } from 'react';
 import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
-import type { ChatRoom, ChatUser } from '../types/chatTypes';
+import { useChatRooms } from '../hooks/useChatApi';
+import { createRoomName, useFetchMembers } from '../hooks/useMembers';
+import type { ChatRoomDTO, ChatUser } from '../types/chatTypes';
 import ContactItem from './ContactItem';
 
 interface ChatSidebarProps {
   width?: number | string;
   searchPlaceholder?: string;
-  rooms?: ChatRoom[];
+  rooms?: ChatRoomDTO[]; // Changed from ChatRoom[] to ChatRoomDTO[]
   activeUsers?: ChatUser[];
   selectedRoomId?: string;
   totalUnreadCount?: number;
+  currentUsername?: string; // Add current username prop
   onRoomSelect?: (roomId: string) => void;
-  onCreateRoom?: (roomName: string, participants: string[]) => void;
+  onCreateRoom?: (roomName: string, participants: string[]) => Promise<void>;
   isLoading?: boolean;
 }
 
 const ChatSidebar = ({
   width = '340px',
   searchPlaceholder = 'Search',
-  rooms = [],
-  activeUsers = [],
+  rooms: _rooms = [],
+  activeUsers: _activeUsers = [],
   selectedRoomId,
-  totalUnreadCount = 0,
+  totalUnreadCount: _totalUnreadCount = 0,
+  currentUsername = 'user123', // TODO: get from auth context
   onRoomSelect,
-  onCreateRoom: _onCreateRoom,
+  onCreateRoom,
   isLoading = false,
 }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchMode, setIsSearchMode] = useState(false); // Toggle between rooms and member search
 
-  const filteredRooms = rooms.filter((room) => room.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Fetch chat rooms from API - now returns ChatRoomDTO with otherMemberName
+  const { data: chatRooms = [], isLoading: roomsLoading } = useChatRooms();
 
-  const handleRoomClick = (roomId: string) => {
-    onRoomSelect?.(roomId);
+  // Fetch members for search functionality
+  const { data: members = [], isLoading: membersLoading } = useFetchMembers();
+
+  // Filter rooms by search term using otherMemberName from DTO
+  const filteredRooms = chatRooms.filter((room) => {
+    return (
+      room.chatRoomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.otherMemberName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // Get list of usernames that already have chat rooms
+  const existingChatMembers = new Set(chatRooms.map((room) => room.otherMemberName));
+
+  // Filter members by search term and exclude those with existing conversations
+  // Only show members from /members/non-admins that don't have existing chat rooms
+  const filteredMembers = members.filter((member) => {
+    // Check if member matches search term
+    const matchesSearch =
+      member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.fullName && member.fullName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    // Check if member doesn't already have a chat room
+    const hasNoExistingChat = !existingChatMembers.has(member.username);
+
+    return matchesSearch && hasNoExistingChat;
+  });
+
+  const handleRoomClick = (room: (typeof chatRooms)[0]) => {
+    onRoomSelect?.(room.otherMemberName);
   };
+
+  const handleMemberClick = async (member: (typeof members)[0]) => {
+    try {
+      const roomName = createRoomName(member);
+      await onCreateRoom?.(roomName, [currentUsername, member.username]);
+
+      setIsSearchMode(false);
+      setSearchTerm('');
+      onRoomSelect?.(member.username);
+    } catch (error) {
+      console.error('Failed to create room:', error);
+    }
+  };
+
+  const isLoadingData = isLoading || roomsLoading || membersLoading;
 
   return (
     <aside className={sidebarCss} style={{ width }}>
       <div className={headerCss}>
-        <h3 className={titleCss}>Contacts</h3>
-        <span className={countCss}>{totalUnreadCount > 0 ? totalUnreadCount : rooms.length}</span>
+        {isSearchMode ? (
+          <>
+            <div className={backButtonContainerCss}>
+              <button
+                type="button"
+                className={backButtonCss}
+                onClick={() => setIsSearchMode(false)}
+                title="Back to chats"
+              >
+                ←
+              </button>
+              <h3 className={titleCss}>New Conversation</h3>
+            </div>
+            <span className={countCss}>{filteredMembers.length} available</span>
+          </>
+        ) : (
+          <>
+            <h3 className={titleCss}>Chats</h3>
+            <div className={headerActionsCss}>
+              <span className={countCss}>{chatRooms.length}</span>
+              <button type="button" className={toggleButtonCss} onClick={() => setIsSearchMode(!isSearchMode)}>
+                👥
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className={searchCss}>
-        <Input placeholder={searchPlaceholder} value={searchTerm} onChange={(value) => setSearchTerm(value)} />
+        <Input
+          placeholder={isSearchMode ? 'Search contacts...' : searchPlaceholder}
+          value={searchTerm}
+          onChange={(value) => setSearchTerm(value)}
+        />
       </div>
 
       <div className={listCss}>
-        {isLoading ? (
-          <div className={loadingCss}>Loading chats...</div>
+        {isLoadingData ? (
+          <div className={loadingCss}>Loading {isSearchMode ? 'users' : 'chats'}...</div>
+        ) : isSearchMode ? (
+          filteredMembers.length > 0 ? (
+            filteredMembers.map((member) => {
+              const displayName = member.fullName || member.username;
+              const subtext = `Start conversation • ${member.role}`;
+
+              return (
+                <ContactItem
+                  key={member.id}
+                  name={displayName}
+                  lastMessage={subtext}
+                  time="💬"
+                  unread={0}
+                  isOnline={member.isActive || false}
+                  isSelected={false}
+                  onClick={() => handleMemberClick(member)}
+                />
+              );
+            })
+          ) : (
+            <div className={emptyStateCss}>
+              <p>No available users found</p>
+              {searchTerm ? (
+                <p className={emptySubtextCss}>Try searching with different keywords</p>
+              ) : (
+                <p className={emptySubtextCss}>All non-admin users already have conversations</p>
+              )}
+            </div>
+          )
         ) : filteredRooms.length > 0 ? (
           filteredRooms.map((room) => {
-            const isOnline = room.participants?.some(
-              (username) => activeUsers.find((user) => user.username === username)?.isOnline,
-            );
+            const isSelected = room.chatRoomId.toString() === selectedRoomId;
+            // Show a welcoming message for new conversations
+            const lastMessage = `Chat with ${room.otherMemberName}`;
 
             return (
               <ContactItem
-                key={room.id}
-                name={room.name}
-                lastMessage={
-                  typeof room.lastMessage === 'string'
-                    ? room.lastMessage
-                    : room.lastMessage?.content || 'No messages yet'
-                }
-                unread={room.unreadCount}
-                isOnline={isOnline}
-                isSelected={room.id === selectedRoomId}
-                onClick={() => handleRoomClick(room.id)}
+                key={room.chatRoomId}
+                name={room.otherMemberName}
+                lastMessage={lastMessage}
+                time="💬" // Chat icon to indicate active conversation
+                unread={0}
+                isOnline={false} // TODO: implement online status
+                isSelected={isSelected}
+                onClick={() => handleRoomClick(room)}
               />
             );
           })
@@ -99,6 +202,44 @@ const headerCss = css({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+});
+
+const headerActionsCss = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+});
+
+const toggleButtonCss = css({
+  background: 'none',
+  border: 'none',
+  fontSize: '18px',
+  cursor: 'pointer',
+  padding: '4px',
+  borderRadius: '4px',
+  transition: 'background-color 0.2s',
+  _hover: {
+    backgroundColor: 'gray.100',
+  },
+});
+
+const backButtonContainerCss = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+});
+
+const backButtonCss = css({
+  background: 'none',
+  border: 'none',
+  fontSize: '18px',
+  cursor: 'pointer',
+  padding: '4px',
+  borderRadius: '4px',
+  transition: 'background-color 0.2s',
+  _hover: {
+    backgroundColor: 'gray.100',
+  },
 });
 
 const titleCss = css({ fontSize: '16px', fontWeight: 700 });

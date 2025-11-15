@@ -1,6 +1,7 @@
+// Updated to match Spring Boot API
 export interface ChatMessage {
-  id: string;
-  chatRoomId: string;
+  id: number; // Changed from string to number
+  chatRoomId: number; // Changed from string to number
   content: string;
   senderUsername: string;
   receiverUsername: string;
@@ -10,12 +11,23 @@ export interface ChatMessage {
 }
 
 export interface ChatRoom {
-  id: string;
+  id: number; // Changed from string to number
   name: string;
-  participants: string[];
+  member1Username: string; // Changed from participants array
+  member2Username: string;
+  createdAt: string;
   lastMessage?: ChatMessage;
   unreadCount?: number;
   isOnline?: boolean;
+  // Computed property for compatibility
+  participants?: string[]; // Will be computed from member1Username + member2Username
+}
+
+// DTO from backend matching ChatRoomDTO
+export interface ChatRoomDTO {
+  chatRoomId: number;
+  chatRoomName: string;
+  otherMemberName: string;
 }
 
 export interface ChatUser {

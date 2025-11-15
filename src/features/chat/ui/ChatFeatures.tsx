@@ -1,40 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
 
 import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
-import { useChat } from '../hooks';
+import { useStompChat } from '../hooks/useStompChat';
 
 export default function ChatFeatures() {
-  const [selectedRoomId, setSelectedRoomId] = useState<string | undefined>();
-  const [currentUsername] = useState<string>('user123'); // TODO: get from auth context
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
 
-  const {
-    isConnected,
-    isLoading,
-    rooms,
-    currentRoom,
-    messages,
-    activeUsers,
-    totalUnreadCount,
-    sendMessage,
-    createRoom,
-    switchRoom,
-    markAllAsRead,
-  } = useChat({
-    socketUrl: 'ws://localhost:8080/api/websocket',
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const [currentUsername] = useState<string>('admin');
+
+  const selectedUsername = isMounted ? searchParams.get('username') : null;
+
+  const { isConnected, isLoading, messages, totalUnreadCount, sendMessage, createRoom } = useStompChat({
+    socketUrl: 'http://localhost:8080/api/websocket',
     username: currentUsername,
-    chatRoomId: selectedRoomId,
-    autoConnect: false, // Disable auto-connect temporarily for debugging
+    chatRoomId: selectedUsername || undefined,
+    autoConnect: true,
   });
 
-  const handleRoomSelect = (roomId: string) => {
-    setSelectedRoomId(roomId);
-    switchRoom(roomId);
-    markAllAsRead();
+  const handleRoomSelect = (roomIdOrUsername: string | number) => {
+    console.log('🚀 handleRoomSelect called with:', roomIdOrUsername);
+
+    if (typeof roomIdOrUsername === 'string' && !roomIdOrUsername.match(/^\d+$/)) {
+      console.log('📍 Navigating with direct username:', roomIdOrUsername);
+      router.push(`/chat?username=${encodeURIComponent(roomIdOrUsername)}`);
+    } else {
+      console.log('📍 Room ID selection not supported without activeUsers');
+    }
+  };
+
+  const handleCreateRoom = async (roomName: string, participants: string[]) => {
+    try {
+      await createRoom(roomName, participants);
+    } catch (error) {
+      console.error('Error creating room:', error);
+    }
   };
 
   const handleSendMessage = (content: string) => {
@@ -47,25 +58,33 @@ export default function ChatFeatures() {
         <div className={sidebarCss}>
           <ChatSidebar
             width={340}
-            searchPlaceholder="Search contacts..."
-            rooms={rooms}
-            activeUsers={activeUsers}
-            selectedRoomId={selectedRoomId}
+            searchPlaceholder="Tìm liên hệ..."
+            rooms={[]}
+            activeUsers={[]}
+            selectedRoomId={selectedUsername || undefined}
             totalUnreadCount={totalUnreadCount}
+            currentUsername={currentUsername}
             onRoomSelect={handleRoomSelect}
-            onCreateRoom={createRoom}
+            onCreateRoom={handleCreateRoom}
             isLoading={isLoading}
           />
         </div>
         <div className={chatWindowCss}>
-          <ChatWindow
-            currentRoom={currentRoom}
-            messages={messages}
-            currentUsername={currentUsername}
-            activeUsers={activeUsers}
-            isConnected={isConnected}
-            onSendMessage={handleSendMessage}
-          />
+          {selectedUsername ? (
+            <ChatWindow
+              title={selectedUsername}
+              messages={messages || []}
+              currentUsername={currentUsername}
+              isConnected={isConnected}
+              onSendMessage={handleSendMessage}
+            />
+          ) : (
+            <div className={emptyChatCss}>
+              <div className={emptyIconCss}>💬</div>
+              <h3 className={emptyTitleCss}>Chọn cuộc trò chuyện</h3>
+              <p className={emptyDescriptionCss}>Chọn liên hệ từ sidebar để bắt đầu nhắn tin</p>
+            </div>
+          )}
         </div>
       </div>
     </Dashboard>
@@ -89,4 +108,34 @@ const chatWindowCss = css({
   minWidth: 0,
   display: 'flex',
   flexDirection: 'column',
+});
+
+const emptyChatCss = css({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FAFAFA',
+  color: '#666',
+});
+
+const emptyIconCss = css({
+  fontSize: '4rem',
+  marginBottom: '1rem',
+  opacity: 0.5,
+});
+
+const emptyTitleCss = css({
+  fontSize: '1.5rem',
+  fontWeight: 'bold',
+  marginBottom: '0.5rem',
+  color: '#333',
+});
+
+const emptyDescriptionCss = css({
+  fontSize: '1rem',
+  textAlign: 'center',
+  maxWidth: '300px',
+  lineHeight: 1.5,
 });
