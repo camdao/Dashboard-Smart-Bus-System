@@ -50,6 +50,7 @@ export type ScheduleDetailResponse = {
   startTime: string;
   endTime: string;
 };
+export type ScheduleDetailResponseDTO = ApiResponse<ScheduleDetailResponse>;
 
 export type CalendarEvent = {
   id: number;

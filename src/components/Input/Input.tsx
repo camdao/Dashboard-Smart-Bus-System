@@ -38,6 +38,7 @@ const TextInput = ({ value, onChange, errorMsg, icon, variant, iconPosition = 'l
       >
         {icon && iconPosition === 'left' && <Icon color="black.40" className={iconCss} name={icon} />}
         <input
+          value={value}
           className={inputCss}
           onChange={handleChange}
           onFocus={() => !props.readOnly && setIsFocused(true)}

@@ -2,12 +2,12 @@ import { useState } from 'react';
 import type { CalendarEvent, ScheduleRequest } from '@/features/calendar/types/scheduleTypes';
 import { mapScheduleToEvent } from '@/features/calendar/utils/mapSchedule';
 
-import useCreateSchedule from './api/useCreateSchedule';
+import useCreateSchedule from './mutation/useCreateSchedule';
 
 export function useAddSchedule() {
   const [error, setError] = useState<string | null>(null);
 
-  const { mutate: createSchedule, isPending: loading } = useCreateSchedule({
+  const { mutateAsync: createSchedule, isPending: loading } = useCreateSchedule({
     onError: (err) => {
       const errorMessage = err instanceof Error ? err.message : 'Không thể tạo lịch làm việc';
       setError(errorMessage);
@@ -18,22 +18,9 @@ export function useAddSchedule() {
     },
   });
 
-  const addSchedule = (scheduleData: ScheduleRequest): Promise<CalendarEvent> => {
-    return new Promise((resolve, reject) => {
-      createSchedule(scheduleData, {
-        onSuccess: (newSchedule) => {
-          try {
-            const newEvent = mapScheduleToEvent(newSchedule);
-            resolve(newEvent);
-          } catch (err) {
-            reject(err);
-          }
-        },
-        onError: (err) => {
-          reject(err);
-        },
-      });
-    });
+  const addSchedule = async (scheduleData: ScheduleRequest): Promise<CalendarEvent> => {
+    const createdSchedule = await createSchedule(scheduleData);
+    return mapScheduleToEvent(createdSchedule);
   };
 
   return {

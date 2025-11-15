@@ -1,49 +1,63 @@
-import type { CalendarEvent, ScheduleRequest } from '@/features/calendar/types/scheduleTypes';
+import { useMemo } from 'react';
+import useUpdateSchedule from '@/features/calendar/hooks/mutation/updateSchedule';
+import type { CalendarEvent, ScheduleRequest, ScheduleResponse } from '@/features/calendar/types/scheduleTypes';
+import { mapScheduleToEvent } from '@/features/calendar/utils/mapSchedule';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useAddSchedule } from './useAddSchedule';
-import { useFetchSchedules } from './useFetchSchedules';
-import { useRemoveSchedule } from './useRemoveSchedule';
-import { useUpdateScheduleHook } from './useUpdateSchedule';
+import useDeleteSchedule from './mutation/deleteSchedule';
+import useCreateSchedule from './mutation/useCreateSchedule';
+import { useGetSchedules } from './queries/getSchedules';
+
+type ApiResponse = ScheduleResponse[] | { data: ScheduleResponse[] };
 
 export function useSchedule() {
-  const { events: fetchedEvents, loading: fetchLoading, error: fetchError, refetch } = useFetchSchedules();
+  const queryClient = useQueryClient();
+  const { data: schedules = [], refetch } = useGetSchedules();
+  const unwrappedSchedules = useMemo(() => {
+    const response = schedules as ApiResponse;
 
-  const { addSchedule: addScheduleApi, loading: addLoading, error: addError } = useAddSchedule();
+    if (Array.isArray(response)) return response;
+    if (response && typeof response === 'object' && 'data' in response) {
+      return Array.isArray(response.data) ? response.data : [];
+    }
+    return [];
+  }, [schedules]);
 
-  const { removeSchedule: removeScheduleApi, loading: removeLoading, error: removeError } = useRemoveSchedule();
+  const events = useMemo(() => unwrappedSchedules.map(mapScheduleToEvent), [unwrappedSchedules]);
 
-  const { updateSchedule: updateScheduleApi, loading: updateLoading, error: updateError } = useUpdateScheduleHook();
-
-  // Bỏ state events và useEffect không cần thiết
+  const { mutateAsync: createSchedule, isPending: addLoading } = useCreateSchedule();
+  const { mutateAsync: updateScheduleMutation, isPending: updateLoading } = useUpdateSchedule();
+  const { mutateAsync: deleteScheduleMutation, isPending: deleteLoading } = useDeleteSchedule();
 
   const addSchedule = async (scheduleData: ScheduleRequest): Promise<CalendarEvent> => {
-    const newEvent = await addScheduleApi(scheduleData);
-    await refetch();
+    const created = await createSchedule(scheduleData);
+
+    const scheduleResponse = (created as { data?: ScheduleResponse })?.data || (created as ScheduleResponse);
+    const newEvent = mapScheduleToEvent(scheduleResponse);
+
+    await queryClient.invalidateQueries({ queryKey: ['schedules'] });
+
     return newEvent;
   };
 
   const removeSchedule = async (id: number): Promise<void> => {
-    await removeScheduleApi(id);
-    await refetch();
+    await deleteScheduleMutation(id);
+    await queryClient.invalidateQueries({ queryKey: ['schedules'] });
   };
 
   const updateSchedule = async (id: number, scheduleData: ScheduleRequest): Promise<void> => {
-    await updateScheduleApi(id, scheduleData);
-    await refetch();
+    await updateScheduleMutation({ id, data: scheduleData });
+    await queryClient.invalidateQueries({ queryKey: ['schedules'] });
   };
 
-  const loading = fetchLoading || addLoading || removeLoading || updateLoading;
-  const error = fetchError || addError || removeError || updateError;
+  const loading = addLoading || updateLoading || deleteLoading;
 
   return {
-    events: fetchedEvents, // Trực tiếp return fetchedEvents
+    events,
     loading,
-    error,
     fetchSchedules: refetch,
     addSchedule,
     removeSchedule,
     updateSchedule,
   };
 }
-
-export type { CalendarEvent, ScheduleRequest };

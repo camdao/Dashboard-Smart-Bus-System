@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,15 +9,16 @@ import { createRoot, type Root } from 'react-dom/client';
 import CalendarAddButton from '../components/CalendarAddButton';
 import EventFormDialog from '../components/EventFormDialog';
 import EventItem from '../components/EventItem';
-import { getScheduleById } from '../hooks/api';
+import { useGetScheduleById } from '../hooks/queries/getScheduleById';
 import { useResourcesQuery } from '../hooks/useResourcesQuery';
-import { type ScheduleRequest, useSchedule } from '../hooks/useSchedule';
+import { useSchedule } from '../hooks/useSchedule';
+import { type ScheduleRequest } from '../types/scheduleTypes';
 
 export default function CalendarFeatures() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
-  const { events, loading, error, addSchedule, removeSchedule, updateSchedule } = useSchedule();
+  const { events, loading, addSchedule, removeSchedule, updateSchedule } = useSchedule();
   const { routes, drivers, buses } = useResourcesQuery();
   const [initialValues, setInitialValues] = useState<{
     routerId: number;
@@ -39,32 +40,39 @@ export default function CalendarFeatures() {
     }
   };
 
-  // ===== EDIT EVENT =====
-  const handleEditEvent = async (eventId: number) => {
-    try {
-      const detail = await getScheduleById(eventId);
+  // ===== EDIT EVENT STATE & HOOK =====
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
-      if (!detail.router?.id || !detail.bus?.id) {
-        console.error('Missing required schedule details:', detail);
+  const { data: eventDetail, isLoading: isLoadingDetail } = useGetScheduleById(selectedEventId ?? 0, {
+    enabled: selectedEventId !== null,
+  });
+
+  useEffect(() => {
+    if (eventDetail && selectedEventId) {
+      if (!eventDetail.router?.id || !eventDetail.bus?.id) {
+        console.error('Missing required schedule details:', eventDetail);
+        setSelectedEventId(null);
         return;
       }
 
-      setEditingEventId(eventId);
+      setEditingEventId(selectedEventId);
       setInitialValues({
-        routerId: detail.router.id,
-        driverId: detail.driver?.id ?? null,
-        busId: detail.bus.id,
-        scheduleDate: detail.scheduleDate,
-        startTime: detail.startTime,
-        endTime: detail.endTime,
+        routerId: eventDetail.router.id,
+        driverId: eventDetail.driver?.id ?? null,
+        busId: eventDetail.bus.id,
+        scheduleDate: eventDetail.scheduleDate,
+        startTime: eventDetail.startTime,
+        endTime: eventDetail.endTime,
       });
-      setSelectedDate(detail.scheduleDate);
+      setSelectedDate(eventDetail.scheduleDate);
       setIsDialogOpen(true);
-    } catch (err) {
-      console.error('Failed to load schedule details:', err);
-      // Fallback: open empty form
-      openCreateDialog(new Date().toISOString().split('T')[0]);
+      setSelectedEventId(null); 
     }
+  }, [eventDetail, selectedEventId]);
+
+  // ===== EDIT EVENT =====
+  const handleEditEvent = (eventId: number) => {
+    setSelectedEventId(eventId); 
   };
 
   const handleUpdateEvent = async (eventData: ScheduleRequest) => {
@@ -133,7 +141,6 @@ export default function CalendarFeatures() {
   return (
     <Dashboard>
       <h1 className={title}>Lịch làm việc</h1>
-      {error && <div className={errorBanner}>{error}</div>}
       <div className={contentBox}>
         <div className={calendarContainer}>
           <FullCalendar
@@ -149,7 +156,7 @@ export default function CalendarFeatures() {
             buttonText={{ today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày' }}
             events={fullCalendarEvents}
             loading={(isLoading) => {
-              if (isLoading || loading) {
+              if (isLoading || loading || isLoadingDetail) {
                 console.log('Loading calendar events...');
               }
             }}
@@ -200,13 +207,13 @@ export default function CalendarFeatures() {
                 }
               }
             }}
-            eventClick={async (info) => {
+            eventClick={(info) => {
               info.jsEvent.preventDefault();
               info.jsEvent.stopPropagation();
 
               const eventId = info.event.extendedProps?.eventId as number | undefined;
               if (eventId) {
-                await handleEditEvent(eventId);
+                handleEditEvent(eventId); // ✅ Không await
               } else {
                 openCreateDialog(info.event.startStr);
               }
@@ -269,24 +276,12 @@ export default function CalendarFeatures() {
   );
 }
 
-// ...existing styles (giữ nguyên tất cả các styles)...
 const title = css({
   fontSize: '2xl',
   fontWeight: 'bold',
   color: 'gray.800',
   marginBottom: '24px',
   paddingLeft: '16px',
-});
-
-const errorBanner = css({
-  backgroundColor: 'red.50',
-  color: 'red.700',
-  padding: '12px 16px',
-  borderRadius: '8px',
-  marginBottom: '16px',
-  border: '1px solid',
-  borderColor: 'red.200',
-  textAlign: 'center',
 });
 
 const contentBox = css({

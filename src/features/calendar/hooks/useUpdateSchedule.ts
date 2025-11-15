@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ScheduleRequest } from '@/features/calendar/types/scheduleTypes';
 
-import useUpdateSchedule from './api/updateSchedule';
+import useUpdateSchedule from './mutation/updateSchedule';
 
 export function useUpdateScheduleHook() {
   const [error, setError] = useState<string | null>(null);

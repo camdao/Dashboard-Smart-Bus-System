@@ -1,6 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { getBuses, getDrivers, getRoutes } from './api';
+import { getBuses } from './api/getBuses';
+import { getDrivers } from './api/getDrivers';
+import { getRoutes } from './api/getRoutes';
+
 
 const RESOURCE_QUERY_KEYS = {
   all: ['resources'] as const,
@@ -9,14 +12,13 @@ const RESOURCE_QUERY_KEYS = {
   buses: () => [...RESOURCE_QUERY_KEYS.all, 'buses'] as const,
 };
 
-
 function normalizeResource(item: unknown) {
   const resource = item as Record<string, unknown>;
   return {
     id: (resource.id || resource.routeId || resource.driverId || resource.busId) as number,
     title: (resource.title ||
       resource.name ||
-      resource.username || 
+      resource.username ||
       resource.routeName ||
       resource.routerName ||
       resource.driverName ||
@@ -26,7 +28,6 @@ function normalizeResource(item: unknown) {
 }
 
 // ==================== Query Hooks ====================
-
 
 export function useRoutesQuery() {
   return useQuery({
@@ -40,7 +41,6 @@ export function useRoutesQuery() {
   });
 }
 
-
 export function useDriversQuery() {
   return useQuery({
     queryKey: RESOURCE_QUERY_KEYS.drivers(),
@@ -52,7 +52,6 @@ export function useDriversQuery() {
     gcTime: 15 * 60 * 1000,
   });
 }
-
 
 export function useBusesQuery() {
   return useQuery({
@@ -67,7 +66,6 @@ export function useBusesQuery() {
 }
 
 // ==================== Composed Hook ====================
-
 
 export function useResourcesQuery() {
   const routesQuery = useRoutesQuery();
@@ -91,7 +89,6 @@ export function useResourcesQuery() {
     },
   };
 }
-
 
 export function usePrefetchResources() {
   const queryClient = useQueryClient();
