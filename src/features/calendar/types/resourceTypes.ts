@@ -1,7 +1,16 @@
+export type ApiResponse<T> = {
+  status: string;
+  message: string;
+  timestamp: string;
+  data: T;
+};
+
 export type Route = {
   id: number;
   routerName: string;
 };
+
+export type RouteDTO = ApiResponse<Route[]>;
 
 export type Driver = {
   id: number;

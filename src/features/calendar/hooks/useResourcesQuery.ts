@@ -31,17 +31,7 @@ export function useResourcesQuery() {
   const { data: driversData = [], refetch: refetchDrivers, isLoading: driversLoading } = useGetDrivers();
   const { data: busesData = [], refetch: refetchBuses, isLoading: busesLoading } = useGetBuses();
 
-  const routes = useMemo(() => {
-    const response = routesData as ApiResponse<unknown>;
-    const unwrapped = Array.isArray(response)
-      ? response
-      : response && typeof response === 'object' && 'data' in response
-        ? Array.isArray(response.data)
-          ? response.data
-          : []
-        : [];
-    return unwrapped.map(normalizeResource);
-  }, [routesData]);
+  const routes = useMemo(() => routesData?.map(normalizeResource) ?? [], [routesData]);
 
   const drivers = useMemo(() => {
     const response = driversData as ApiResponse<unknown>;

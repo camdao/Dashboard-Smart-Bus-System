@@ -4,6 +4,7 @@ import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import FullCalendar from '@fullcalendar/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { createRoot, type Root } from 'react-dom/client';
 
 import CalendarAddButton from '../components/CalendarAddButton';
@@ -14,6 +15,7 @@ import { useSchedule } from '../hooks/useSchedule';
 import { type ScheduleRequest } from '../types/scheduleTypes';
 
 export default function CalendarFeatures() {
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
@@ -44,8 +46,10 @@ export default function CalendarFeatures() {
   // ===== EDIT EVENT =====
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
-  const { data: eventDetail, isLoading: isLoadingDetail } = useGetScheduleById(selectedEventId ?? 0, {
+  const { data: eventDetail } = useGetScheduleById(selectedEventId ?? 0, {
     enabled: selectedEventId !== null,
+    staleTime: 0, // ✅ Không cache, luôn fetch mới
+    gcTime: 0, // ✅ (cacheTime trong v5) Không lưu cache
   });
 
   useEffect(() => {
@@ -67,11 +71,13 @@ export default function CalendarFeatures() {
       });
       setSelectedDate(eventDetail.scheduleDate);
       setIsDialogOpen(true);
-      setSelectedEventId(null);
+      setSelectedEventId(null); // ✅ Reset sau khi có data
     }
   }, [eventDetail, selectedEventId]);
 
   const handleEditEvent = (eventId: number) => {
+    // ✅ Xóa cache trước khi fetch để đảm bảo data mới
+    queryClient.removeQueries({ queryKey: ['schedules', eventId] });
     setSelectedEventId(eventId);
   };
 
@@ -80,6 +86,8 @@ export default function CalendarFeatures() {
 
     try {
       await updateMutation.mutateAsync({ id: editingEventId, data: eventData });
+      // ✅ Xóa cache detail sau khi update thành công
+      queryClient.removeQueries({ queryKey: ['schedules', editingEventId] });
       closeDialog();
     } catch (err) {
       console.error('Failed to update schedule:', err);
@@ -89,7 +97,7 @@ export default function CalendarFeatures() {
   // ===== DELETE EVENT =====
   const handleDeleteEvent = async (eventId: number) => {
     try {
-      await deleteMutation.mutateAsync(eventId); 
+      await deleteMutation.mutateAsync(eventId);
     } catch (err) {
       console.error('Failed to delete schedule:', err);
     }
@@ -97,6 +105,7 @@ export default function CalendarFeatures() {
 
   // ===== DIALOG HANDLERS =====
   const openCreateDialog = (date: string) => {
+    setSelectedEventId(null); // ✅ Clear để disable edit query
     setSelectedDate(date);
     setInitialValues(null);
     setEditingEventId(null);
@@ -115,6 +124,8 @@ export default function CalendarFeatures() {
     setIsDialogOpen(false);
     setEditingEventId(null);
     setInitialValues(null);
+    setSelectedDate('');
+    setSelectedEventId(null);
   };
 
   const fullCalendarEvents = events.map(
@@ -156,7 +167,7 @@ export default function CalendarFeatures() {
             buttonText={{ today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày' }}
             events={fullCalendarEvents}
             loading={(isLoading) => {
-              if (isLoading || loading || isLoadingDetail) {
+              if (isLoading || loading) {
                 console.log('Loading calendar events...');
               }
             }}
@@ -172,7 +183,6 @@ export default function CalendarFeatures() {
                 if (eventId) {
                   handleDeleteEvent(eventId);
                 }
-                eventInfo.event.remove();
               };
 
               const start = (eventInfo.event.extendedProps?.startTime as string) || '';
