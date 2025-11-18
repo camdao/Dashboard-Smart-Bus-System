@@ -48,8 +48,8 @@ export default function CalendarFeatures() {
 
   const { data: eventDetail } = useGetScheduleById(selectedEventId ?? 0, {
     enabled: selectedEventId !== null,
-    staleTime: 0, // ✅ Không cache, luôn fetch mới
-    gcTime: 0, // ✅ (cacheTime trong v5) Không lưu cache
+    staleTime: 0,
+    gcTime: 0,
   });
 
   useEffect(() => {
@@ -71,12 +71,11 @@ export default function CalendarFeatures() {
       });
       setSelectedDate(eventDetail.scheduleDate);
       setIsDialogOpen(true);
-      setSelectedEventId(null); // ✅ Reset sau khi có data
+      setSelectedEventId(null);
     }
   }, [eventDetail, selectedEventId]);
 
   const handleEditEvent = (eventId: number) => {
-    // ✅ Xóa cache trước khi fetch để đảm bảo data mới
     queryClient.removeQueries({ queryKey: ['schedules', eventId] });
     setSelectedEventId(eventId);
   };
@@ -86,7 +85,6 @@ export default function CalendarFeatures() {
 
     try {
       await updateMutation.mutateAsync({ id: editingEventId, data: eventData });
-      // ✅ Xóa cache detail sau khi update thành công
       queryClient.removeQueries({ queryKey: ['schedules', editingEventId] });
       closeDialog();
     } catch (err) {
@@ -105,7 +103,7 @@ export default function CalendarFeatures() {
 
   // ===== DIALOG HANDLERS =====
   const openCreateDialog = (date: string) => {
-    setSelectedEventId(null); // ✅ Clear để disable edit query
+    setSelectedEventId(null); 
     setSelectedDate(date);
     setInitialValues(null);
     setEditingEventId(null);

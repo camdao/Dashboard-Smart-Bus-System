@@ -44,7 +44,6 @@ export default function EventFormDialog({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
-    // ✅ Clear form khi dialog đóng
     if (!isOpen) {
       setRouteId('');
       setDriverId('');
@@ -55,50 +54,50 @@ export default function EventFormDialog({
       return;
     }
 
-    // ✅ Set form cho edit mode
-    if (initialValues) {
-      const sRaw = initialValues.startTime || '';
-      const eRaw = initialValues.endTime || '';
+    if (!initialValues) {
+      if (selectedDate) {
+        const defaultStart = `${selectedDate}T09:00`;
+        const defaultEnd = `${selectedDate}T10:00`;
 
-      const normalizeToHHmm = (raw: string) => {
-        if (!raw) return '';
-        const hhmmss = raw.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
-        if (hhmmss) return `${hhmmss[1].padStart(2, '0')}:${hhmmss[2]}`;
-        const hhmm = raw.match(/^(\d{1,2}):(\d{2})$/);
-        if (hhmm) return `${hhmm[1].padStart(2, '0')}:${hhmm[2]}`;
-        const hh = raw.match(/^(\d{1,2})$/);
-        if (hh) return `${hh[1].padStart(2, '0')}:00`;
-        return '';
-      };
+        setStartDateTime(defaultStart);
+        setEndDateTime(defaultEnd);
+        setRouteId('');
+        setDriverId('');
+        setBusId('');
+      }
 
-      const s = normalizeToHHmm(sRaw);
-      const e = normalizeToHHmm(eRaw);
-
-      setStartDateTime(s ? `${initialValues.scheduleDate}T${s}` : '');
-      setEndDateTime(e ? `${initialValues.scheduleDate}T${e}` : '');
-      setRouteId(String(initialValues.routerId));
-      setBusId(String(initialValues.busId));
-      setDriverId(String(initialValues.driverId || ''));
-      return;
+      return; // ❗ quan trọng: dừng luôn
     }
 
-    // ✅ Set form cho create mode
-    if (selectedDate) {
-      const defaultStart = `${selectedDate}T09:00`;
-      const defaultEnd = `${selectedDate}T10:00`;
-      setStartDateTime(defaultStart);
-      setEndDateTime(defaultEnd);
-      setRouteId('');
-      setDriverId('');
-      setBusId('');
-    }
+    // ===== CASE: EDIT (HAS initialValues) =====
+    const sRaw = initialValues.startTime || '';
+    const eRaw = initialValues.endTime || '';
+
+    const normalizeToHHmm = (raw: string) => {
+      if (!raw) return '';
+      const hhmmss = raw.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+      if (hhmmss) return `${hhmmss[1].padStart(2, '0')}:${hhmmss[2]}`;
+      const hhmm = raw.match(/^(\d{1,2}):(\d{2})$/);
+      if (hhmm) return `${hhmm[1].padStart(2, '0')}:${hhmm[2]}`;
+      const hh = raw.match(/^(\d{1,2})$/);
+      if (hh) return `${hh[1].padStart(2, '0')}:00`;
+      return '';
+    };
+
+    const s = normalizeToHHmm(sRaw);
+    const e = normalizeToHHmm(eRaw);
+
+    setStartDateTime(s ? `${initialValues.scheduleDate}T${s}` : '');
+    setEndDateTime(e ? `${initialValues.scheduleDate}T${e}` : '');
+    setRouteId(String(initialValues.routerId));
+    setBusId(String(initialValues.busId));
+    setDriverId(String(initialValues.driverId || ''));
   }, [isOpen, selectedDate, initialValues]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validate required fields
     if (!routeId || !driverId || !busId) {
       setError('Vui lòng chọn đầy đủ thông tin: Tuyến đường, Tài xế và Xe buýt.');
       return;
@@ -116,10 +115,9 @@ export default function EventFormDialog({
 
     setIsSubmitting(true);
 
-    // Extract date and time
-    const scheduleDate = startDateTime.split('T')[0]; // YYYY-MM-DD
-    const startTime = startDateTime.split('T')[1]; // HH:mm
-    const endTime = endDateTime.split('T')[1]; // HH:mm
+    const scheduleDate = startDateTime.split('T')[0];
+    const startTime = startDateTime.split('T')[1];
+    const endTime = endDateTime.split('T')[1];
 
     onSubmit({
       routerId: Number(routeId),
