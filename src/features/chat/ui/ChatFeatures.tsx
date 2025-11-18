@@ -20,24 +20,39 @@ export default function ChatFeatures() {
 
   const [currentUsername] = useState<string>('admin');
 
-  const selectedUsername = isMounted ? searchParams.get('username') : null;
+  // Store selected room info in state
+  const [selectedRoom, setSelectedRoom] = useState<{
+    roomId: string;
+    username: string;
+  } | null>(null);
+
+  // Update selectedRoom when URL params change
+  useEffect(() => {
+    if (isMounted) {
+      const roomId = searchParams.get('roomId');
+      const username = searchParams.get('username');
+
+      if (roomId && username) {
+        setSelectedRoom({ roomId, username });
+      } else {
+        setSelectedRoom(null);
+      }
+    }
+  }, [isMounted, searchParams]);
 
   const { isConnected, isLoading, messages, totalUnreadCount, sendMessage, createRoom } = useStompChat({
     socketUrl: 'http://localhost:8080/api/websocket',
     username: currentUsername,
-    chatRoomId: selectedUsername || undefined,
+    chatRoomId: selectedRoom?.roomId,
+    receiverUsername: selectedRoom?.username,
     autoConnect: true,
   });
 
-  const handleRoomSelect = (roomIdOrUsername: string | number) => {
-    console.log('🚀 handleRoomSelect called with:', roomIdOrUsername);
+  const handleRoomSelect = (roomId: string, username: string) => {
+    console.log('🚀 handleRoomSelect called with:', { roomId, username });
 
-    if (typeof roomIdOrUsername === 'string' && !roomIdOrUsername.match(/^\d+$/)) {
-      console.log('📍 Navigating with direct username:', roomIdOrUsername);
-      router.push(`/chat?username=${encodeURIComponent(roomIdOrUsername)}`);
-    } else {
-      console.log('📍 Room ID selection not supported without activeUsers');
-    }
+    // Navigate with both roomId and username
+    router.push(`/chat?roomId=${encodeURIComponent(roomId)}&username=${encodeURIComponent(username)}`);
   };
 
   const handleCreateRoom = async (roomName: string, participants: string[]) => {
@@ -61,7 +76,7 @@ export default function ChatFeatures() {
             searchPlaceholder="Tìm liên hệ..."
             rooms={[]}
             activeUsers={[]}
-            selectedRoomId={selectedUsername || undefined}
+            selectedRoomId={selectedRoom?.roomId}
             totalUnreadCount={totalUnreadCount}
             currentUsername={currentUsername}
             onRoomSelect={handleRoomSelect}
@@ -70,9 +85,9 @@ export default function ChatFeatures() {
           />
         </div>
         <div className={chatWindowCss}>
-          {selectedUsername ? (
+          {selectedRoom ? (
             <ChatWindow
-              title={selectedUsername}
+              title={selectedRoom.username}
               messages={messages || []}
               currentUsername={currentUsername}
               isConnected={isConnected}

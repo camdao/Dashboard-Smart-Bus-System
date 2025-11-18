@@ -15,7 +15,7 @@ interface ChatSidebarProps {
   selectedRoomId?: string;
   totalUnreadCount?: number;
   currentUsername?: string; // Add current username prop
-  onRoomSelect?: (roomId: string) => void;
+  onRoomSelect?: (roomId: string, username: string) => void; // Updated signature
   onCreateRoom?: (roomName: string, participants: string[]) => Promise<void>;
   isLoading?: boolean;
 }
@@ -67,7 +67,7 @@ const ChatSidebar = ({
   });
 
   const handleRoomClick = (room: (typeof chatRooms)[0]) => {
-    onRoomSelect?.(room.otherMemberName);
+    onRoomSelect?.(room.chatRoomId.toString(), room.otherMemberName);
   };
 
   const handleMemberClick = async (member: (typeof members)[0]) => {
@@ -77,7 +77,10 @@ const ChatSidebar = ({
 
       setIsSearchMode(false);
       setSearchTerm('');
-      onRoomSelect?.(member.username);
+
+      // After creating room, navigate with username
+      // The parent will need to fetch the room list to get the actual roomId
+      onRoomSelect?.('', member.username);
     } catch (error) {
       console.error('Failed to create room:', error);
     }

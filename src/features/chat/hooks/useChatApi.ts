@@ -17,6 +17,8 @@ export function useChatHistory(chatRoomId?: number) {
     enabled: !!chatRoomId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    retry: false, // Don't retry on error
+    refetchOnMount: false, // Don't refetch when component mounts
   });
 }
 

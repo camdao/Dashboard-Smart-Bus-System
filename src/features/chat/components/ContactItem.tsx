@@ -26,7 +26,10 @@ const ContactItem = ({
   const isActiveContact = selected || isSelected;
 
   return (
-    <div className={cx(containerCss, isActiveContact && selectedCss)} onClick={onClick}>
+    <div 
+      className={cx(containerCss, isActiveContact && selectedCss, 'group')} 
+      onClick={onClick}
+    >
       <div className={avatarContainerCss}>
         <div className={avatarCss} style={{ width: avatarSize, height: avatarSize }} aria-hidden />
         {isOnline && <div className={onlineIndicatorCss} />}
@@ -53,17 +56,34 @@ const containerCss = css({
   padding: '12px',
   alignItems: 'center',
   cursor: 'pointer',
-  borderRadius: '10px',
-  transition: 'background 0.15s ease',
-  _hover: { backgroundColor: 'gray.50' },
+  borderRadius: '12px',
+  transition: 'all 0.2s ease',
+  position: 'relative',
+  overflow: 'hidden',
+  
+  _hover: { 
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    transform: 'translateX(4px)',
+    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.1)',
+  },
+  
+  _active: {
+    transform: 'translateX(2px)',
+  },
 });
 
 const avatarCss = css({
   width: '48px',
   height: '48px',
   borderRadius: '9999px',
-  background: 'linear-gradient(135deg,#E6F0FF,#D6E9FF)',
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   flexShrink: 0,
+  transition: 'transform 0.2s ease',
+  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+  
+  _groupHover: {
+    transform: 'scale(1.05)',
+  },
 });
 
 const contentCss = css({
@@ -103,14 +123,26 @@ const messageCss = css({
 
 const badgeCss = css({
   marginLeft: '8px',
-  backgroundColor: 'blue.400',
+  backgroundColor: 'blue.500',
   color: 'white',
-  fontSize: '12px',
-  padding: '4px 8px',
+  fontSize: '11px',
+  fontWeight: 600,
+  padding: '3px 8px',
   borderRadius: '9999px',
+  minWidth: '20px',
+  textAlign: 'center',
+  boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 });
 
-const selectedCss = css({ backgroundColor: 'blue.50', borderLeft: '3px solid', borderColor: 'blue.400' });
+const selectedCss = css({ 
+  backgroundColor: 'rgba(59, 130, 246, 0.15)',
+  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.15)',
+  
+  _hover: {
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+  },
+});
 
 const avatarContainerCss = css({
   position: 'relative',
@@ -127,4 +159,15 @@ const onlineIndicatorCss = css({
   backgroundColor: '#10B981',
   borderRadius: '9999px',
   border: '2px solid white',
+  boxShadow: '0 0 0 0 rgba(16, 185, 129, 0.7)',
+  animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+  
+  _before: {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: '9999px',
+    backgroundColor: '#10B981',
+    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+  },
 });

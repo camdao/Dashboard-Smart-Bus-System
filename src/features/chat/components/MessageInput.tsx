@@ -27,10 +27,23 @@ const MessageInput = ({
     setValue('');
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
     <div className={inputWrapCss}>
       <div className={inputContainerCss}>
-        <Input value={value} onChange={setValue} placeholder={placeholder} disabled={disabled} />
+        <Input
+          value={value}
+          onChange={setValue}
+          placeholder={placeholder}
+          disabled={disabled}
+          onKeyDown={handleKeyDown}
+        />
       </div>
 
       <div className={actionsCss}>

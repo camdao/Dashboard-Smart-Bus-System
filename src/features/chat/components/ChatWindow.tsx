@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { css, cx } from '@/styled-system/css';
 
 import type { ChatMessage } from '../types/chatTypes';
@@ -16,11 +17,19 @@ interface ChatWindowProps {
 }
 
 const ChatWindow = ({ title, messages = [], currentUsername, isConnected = false, onSendMessage }: ChatWindowProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const handleSend = (content: string) => {
     if (title && onSendMessage) {
       onSendMessage(content);
     }
   };
+
   return (
     <section className={windowCss}>
       <div className={cardCss}>
@@ -36,16 +45,29 @@ const ChatWindow = ({ title, messages = [], currentUsername, isConnected = false
 
         <div className={messagesCss}>
           {messages.length > 0 ? (
-            messages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                text={msg.content}
-                fromSelf={msg.senderUsername === currentUsername}
-                timestamp={msg.timestamp}
-                isRead={msg.isRead}
-                senderOnline={false}
-              />
-            ))
+            <>
+              {messages.map((msg, index) => {
+                const isFromSelf = msg.senderUsername === currentUsername;
+                console.log('Message:', {
+                  id: msg.id,
+                  content: msg.content,
+                  senderUsername: msg.senderUsername,
+                  currentUsername: currentUsername,
+                  isFromSelf: isFromSelf,
+                });
+                return (
+                  <MessageBubble
+                    key={msg.id ? `${msg.id}-${index}` : `temp-${index}`}
+                    text={msg.content}
+                    fromSelf={isFromSelf}
+                    timestamp={msg.timestamp}
+                    isRead={msg.isRead}
+                    senderOnline={false}
+                  />
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </>
           ) : (
             <div className={emptyMessagesCss}>
               <p>No messages yet</p>
