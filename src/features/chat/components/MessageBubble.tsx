@@ -20,7 +20,6 @@ const MessageBubble = ({
   maxWidth = '72%',
   showTimestamp = true,
   className,
-  isRead = false,
   senderOnline = false,
 }: MessageBubbleProps) => {
   const formatTime = (ts: string) => {
@@ -39,7 +38,7 @@ const MessageBubble = ({
     <div className={cx(wrapperCss, fromSelf ? selfCss : otherCss)} style={{ maxWidth }}>
       <div className={bubbleClass}>
         {text}
-        {fromSelf && <div className={readStatusCss}>{isRead ? '✓✓' : '✓'}</div>}
+        {fromSelf && <div className={readStatusCss}></div>}
       </div>
       {showTimestamp && (
         <div className={timeWrapperCss}>

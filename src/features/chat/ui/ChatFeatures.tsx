@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
+import { getCurrentUserId } from '@/utils/auth';
 
+import { useUserInfo } from '../apis/memberApi';
 import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
 import { useStompChat } from '../hooks/useStompChat';
@@ -18,15 +20,15 @@ export default function ChatFeatures() {
     setIsMounted(true);
   }, []);
 
-  const [currentUsername] = useState<string>('admin');
+  const currentUserId = getCurrentUserId();
 
-  // Store selected room info in state
+  const { data: userInfo } = useUserInfo(currentUserId);
+  const currentUsername = userInfo?.username || null;
   const [selectedRoom, setSelectedRoom] = useState<{
     roomId: string;
     username: string;
   } | null>(null);
 
-  // Update selectedRoom when URL params change
   useEffect(() => {
     if (isMounted) {
       const roomId = searchParams.get('roomId');
@@ -38,11 +40,11 @@ export default function ChatFeatures() {
         setSelectedRoom(null);
       }
     }
-  }, [isMounted, searchParams]);
+  }, [isMounted, searchParams, currentUsername]);
 
   const { isConnected, isLoading, messages, totalUnreadCount, sendMessage, createRoom } = useStompChat({
     socketUrl: 'http://localhost:8080/api/websocket',
-    username: currentUsername,
+    username: currentUsername || undefined,
     chatRoomId: selectedRoom?.roomId,
     receiverUsername: selectedRoom?.username,
     autoConnect: true,
@@ -51,7 +53,6 @@ export default function ChatFeatures() {
   const handleRoomSelect = (roomId: string, username: string) => {
     console.log('🚀 handleRoomSelect called with:', { roomId, username });
 
-    // Navigate with both roomId and username
     router.push(`/chat?roomId=${encodeURIComponent(roomId)}&username=${encodeURIComponent(username)}`);
   };
 
@@ -78,7 +79,7 @@ export default function ChatFeatures() {
             activeUsers={[]}
             selectedRoomId={selectedRoom?.roomId}
             totalUnreadCount={totalUnreadCount}
-            currentUsername={currentUsername}
+            currentUsername={currentUsername || undefined}
             onRoomSelect={handleRoomSelect}
             onCreateRoom={handleCreateRoom}
             isLoading={isLoading}
@@ -89,7 +90,7 @@ export default function ChatFeatures() {
             <ChatWindow
               title={selectedRoom.username}
               messages={messages || []}
-              currentUsername={currentUsername}
+              currentUsername={currentUsername || undefined}
               isConnected={isConnected}
               onSendMessage={handleSendMessage}
             />

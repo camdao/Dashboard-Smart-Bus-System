@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Icon from '@/components/Icon';
 import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
@@ -10,11 +11,11 @@ import ContactItem from './ContactItem';
 interface ChatSidebarProps {
   width?: number | string;
   searchPlaceholder?: string;
-  rooms?: ChatRoomDTO[]; // Changed from ChatRoom[] to ChatRoomDTO[]
+  rooms?: ChatRoomDTO[];
   activeUsers?: ChatUser[];
   selectedRoomId?: string;
   totalUnreadCount?: number;
-  currentUsername?: string; // Add current username prop
+  currentUsername?: string;
   onRoomSelect?: (roomId: string, username: string) => void; // Updated signature
   onCreateRoom?: (roomName: string, participants: string[]) => Promise<void>;
   isLoading?: boolean;
@@ -27,21 +28,18 @@ const ChatSidebar = ({
   activeUsers: _activeUsers = [],
   selectedRoomId,
   totalUnreadCount: _totalUnreadCount = 0,
-  currentUsername = 'user123', // TODO: get from auth context
+  currentUsername = 'user123',
   onRoomSelect,
   onCreateRoom,
   isLoading = false,
 }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearchMode, setIsSearchMode] = useState(false); // Toggle between rooms and member search
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
-  // Fetch chat rooms from API - now returns ChatRoomDTO with otherMemberName
   const { data: chatRooms = [], isLoading: roomsLoading } = useChatRooms();
 
-  // Fetch members for search functionality
   const { data: members = [], isLoading: membersLoading } = useFetchMembers();
 
-  // Filter rooms by search term using otherMemberName from DTO
   const filteredRooms = chatRooms.filter((room) => {
     return (
       room.chatRoomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,18 +47,13 @@ const ChatSidebar = ({
     );
   });
 
-  // Get list of usernames that already have chat rooms
   const existingChatMembers = new Set(chatRooms.map((room) => room.otherMemberName));
 
-  // Filter members by search term and exclude those with existing conversations
-  // Only show members from /members/non-admins that don't have existing chat rooms
   const filteredMembers = members.filter((member) => {
-    // Check if member matches search term
     const matchesSearch =
       member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (member.fullName && member.fullName.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    // Check if member doesn't already have a chat room
     const hasNoExistingChat = !existingChatMembers.has(member.username);
 
     return matchesSearch && hasNoExistingChat;
@@ -77,9 +70,6 @@ const ChatSidebar = ({
 
       setIsSearchMode(false);
       setSearchTerm('');
-
-      // After creating room, navigate with username
-      // The parent will need to fetch the room list to get the actual roomId
       onRoomSelect?.('', member.username);
     } catch (error) {
       console.error('Failed to create room:', error);
@@ -112,7 +102,7 @@ const ChatSidebar = ({
             <div className={headerActionsCss}>
               <span className={countCss}>{chatRooms.length}</span>
               <button type="button" className={toggleButtonCss} onClick={() => setIsSearchMode(!isSearchMode)}>
-                👥
+                <Icon name="GroupIcon" size={18} />
               </button>
             </div>
           </>
@@ -162,7 +152,6 @@ const ChatSidebar = ({
         ) : filteredRooms.length > 0 ? (
           filteredRooms.map((room) => {
             const isSelected = room.chatRoomId.toString() === selectedRoomId;
-            // Show a welcoming message for new conversations
             const lastMessage = `Chat with ${room.otherMemberName}`;
 
             return (
@@ -170,9 +159,8 @@ const ChatSidebar = ({
                 key={room.chatRoomId}
                 name={room.otherMemberName}
                 lastMessage={lastMessage}
-                time="💬" // Chat icon to indicate active conversation
                 unread={0}
-                isOnline={false} // TODO: implement online status
+                isOnline={false} 
                 isSelected={isSelected}
                 onClick={() => handleRoomClick(room)}
               />

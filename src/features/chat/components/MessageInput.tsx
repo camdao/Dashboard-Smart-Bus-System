@@ -76,5 +76,3 @@ const inputContainerCss = css({
 });
 
 const actionsCss = css({ display: 'flex', gap: '8px', alignItems: 'center' });
-
-// slightly smaller button style can be handled via Button props; keep CSS minimal here

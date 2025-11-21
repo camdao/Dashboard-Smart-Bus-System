@@ -19,7 +19,6 @@ export interface ChatRoom {
   lastMessage?: Message;
 }
 
-// DTO from backend matching ChatRoomDTO
 export interface ChatRoomDTO {
   chatRoomId: number;
   chatRoomName: string;
@@ -39,14 +38,12 @@ interface ApiResponse<T> {
   timestamp: string;
 }
 
-// Get chat history for a specific room
 export async function getChatHistory(chatRoomId: number): Promise<Message[]> {
   const response = await client.get(`/api/chat/history/${chatRoomId}`);
   const apiResponse = response as ApiResponse<Message[]>;
   return apiResponse.data;
 }
 
-// Create or get existing chat room between two members
 export async function createChatRoom(
   name: string,
   member1Username: string,
@@ -63,7 +60,6 @@ export async function createChatRoom(
   return apiResponse.data;
 }
 
-// Get all chat rooms for current member
 export async function getAllChatRoomsByMember(): Promise<ChatRoomDTO[]> {
   const response = await client.get('/api/chat/rooms/member');
   const apiResponse = response as ApiResponse<ChatRoomDTO[]>;

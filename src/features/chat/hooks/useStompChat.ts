@@ -9,7 +9,7 @@ interface UseStompChatOptions {
   socketUrl: string;
   username?: string;
   chatRoomId?: string;
-  receiverUsername?: string; // Add this
+  receiverUsername?: string; 
   autoConnect?: boolean;
 }
 
@@ -22,20 +22,15 @@ export function useStompChat(options: UseStompChatOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [totalUnreadCount] = useState(0);
 
-  // Use API for room creation
   const createRoomMutation = useCreateChatRoom();
 
-  // Fetch chat history when chatRoomId changes
   const { data: chatHistory = [], isError } = useChatHistory(chatRoomId ? parseInt(chatRoomId) : undefined);
 
-  // Load chat history into messages when it changes
   useEffect(() => {
-    // Only update messages when we have a chatRoomId
     if (!chatRoomId) {
-      return; // Don't clear messages if no room is selected
+      return;
     }
 
-    // If there's an error fetching history, just clear messages and don't retry
     if (isError) {
       console.warn('⚠️ Error fetching chat history for room:', chatRoomId);
       setMessages([]);
@@ -43,13 +38,11 @@ export function useStompChat(options: UseStompChatOptions) {
     }
 
     if (chatHistory.length > 0) {
-      console.log('📜 Loading chat history:', chatHistory.length, 'messages');
       setMessages(chatHistory as ChatMessage[]);
     } else {
-      // Clear messages when switching rooms or no history for this room
       setMessages([]);
     }
-  }, [chatRoomId, chatHistory.length, isError]); // Use length instead of entire array
+  }, [chatRoomId, chatHistory.length, isError]);
 
   useEffect(() => {
     if (!autoConnect || !username) return;
@@ -75,7 +68,6 @@ export function useStompChat(options: UseStompChatOptions) {
         console.log('📩 Received personal message:', chatMessage);
 
         setMessages((prev) => {
-          // Check if message already exists to prevent duplicates
           const exists = prev.some(
             (m) =>
               m.id === chatMessage.id ||
@@ -100,7 +92,6 @@ export function useStompChat(options: UseStompChatOptions) {
           console.log('📩 Received room message:', roomMessage);
 
           setMessages((prev) => {
-            // Check if message already exists to prevent duplicates
             const exists = prev.some(
               (m) =>
                 m.id === roomMessage.id ||
@@ -143,38 +134,23 @@ export function useStompChat(options: UseStompChatOptions) {
   const sendMessage = useCallback(
     (content: string, receiverUsernameOverride?: string) => {
       const actualReceiver = receiverUsernameOverride || receiverUsername;
-
-      // Detailed logging for debugging
-      console.log('🔍 sendMessage debug:', {
-        connected: clientRef.current?.connected,
-        username,
-        chatRoomId,
-        receiverUsername: actualReceiver,
-        content,
-      });
-
       if (!clientRef.current?.connected) {
-        console.warn('❌ WebSocket not connected');
         return;
       }
 
       if (!username) {
-        console.warn('❌ Username is missing');
         return;
       }
 
       if (!chatRoomId) {
-        console.warn('❌ ChatRoomId is missing');
         return;
       }
 
       if (!actualReceiver) {
-        console.warn('❌ ReceiverUsername is missing');
         return;
       }
 
       if (!content.trim()) {
-        console.warn('❌ Message content is empty');
         return;
       }
 
@@ -186,9 +162,8 @@ export function useStompChat(options: UseStompChatOptions) {
 
       console.log('📤 Sending message:', message);
 
-      // Optimistically add message to UI immediately
       const optimisticMessage: ChatMessage = {
-        id: -Date.now(), // Temporary negative ID to distinguish from real messages
+        id: -Date.now(),
         chatRoomId: parseInt(chatRoomId),
         senderUsername: username,
         receiverUsername: actualReceiver,
@@ -214,7 +189,6 @@ export function useStompChat(options: UseStompChatOptions) {
         return;
       }
 
-      // Find the other participant (assuming participants includes current user)
       const otherParticipant = participants.find((p) => p !== username) || participants[1];
 
       try {

@@ -5,9 +5,11 @@ import CategoryIcon from './CategoryIcon';
 import ChatIcon from './ChatIcon';
 import EyeIcon from './EyeIcon';
 import EyeOffIcon from './EyeOffIcon';
+import GroupIcon from './GroupIcon';
 import LockIcon from './LockIcon';
 import Logout from './Logout';
 import MapIcon from './MapIcon';
+import MessageBubbleIcon from './MessageBubbleIcon';
 import MessageIcon from './MessageIcon';
 import ScheduleIcon from './ScheduleIcon';
 import { TrashIcon } from './TrashIcon';
@@ -23,6 +25,8 @@ export const IconComponentMap = {
   ChatIcon: ChatIcon,
   MapIcon: MapIcon,
   TrashIcon: TrashIcon,
+  GroupIcon: GroupIcon,
+  MessageBubbleIcon: MessageBubbleIcon,
 } as const;
 
 interface Props extends IconComponentProps {
