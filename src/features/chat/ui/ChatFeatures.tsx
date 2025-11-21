@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Dashboard from '@/features/LayoutAdmin/containers/DashboardContainers';
 import { css } from '@/styled-system/css';
@@ -9,6 +9,8 @@ import { getCurrentUserId } from '@/utils/auth';
 import { useUserInfo } from '../apis/memberApi';
 import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
+import { useChatRooms } from '../hooks/useChatApi';
+import { useFetchMembers } from '../hooks/useMembers';
 import { useStompChat } from '../hooks/useStompChat';
 
 export default function ChatFeatures() {
@@ -42,7 +44,7 @@ export default function ChatFeatures() {
     }
   }, [isMounted, searchParams, currentUsername]);
 
-  const { isConnected, isLoading, messages, totalUnreadCount, sendMessage, createRoom } = useStompChat({
+  const { isConnected, messages, totalUnreadCount, sendMessage, createRoom } = useStompChat({
     socketUrl: 'http://localhost:8080/api/websocket',
     username: currentUsername || undefined,
     chatRoomId: selectedRoom?.roomId,
@@ -50,23 +52,24 @@ export default function ChatFeatures() {
     autoConnect: true,
   });
 
-  const handleRoomSelect = (roomId: string, username: string) => {
-    console.log('🚀 handleRoomSelect called with:', { roomId, username });
-
+  const handleRoomSelect = useCallback((roomId: string, username: string) => {
     router.push(`/chat?roomId=${encodeURIComponent(roomId)}&username=${encodeURIComponent(username)}`);
-  };
+  }, []);
 
-  const handleCreateRoom = async (roomName: string, participants: string[]) => {
+  const handleCreateRoom = useCallback(async (roomName: string, participants: string[]) => {
     try {
       await createRoom(roomName, participants);
     } catch (error) {
       console.error('Error creating room:', error);
     }
-  };
+  }, []);
 
   const handleSendMessage = (content: string) => {
     sendMessage(content);
   };
+
+  const { data: chatRooms = [], isLoading: roomsLoading } = useChatRooms();
+  const { data: members = [], isLoading: membersLoading } = useFetchMembers();
 
   return (
     <Dashboard>
@@ -75,14 +78,14 @@ export default function ChatFeatures() {
           <ChatSidebar
             width={340}
             searchPlaceholder="Tìm liên hệ..."
-            rooms={[]}
-            activeUsers={[]}
+            chatRooms={chatRooms}
+            members={members}
             selectedRoomId={selectedRoom?.roomId}
             totalUnreadCount={totalUnreadCount}
             currentUsername={currentUsername || undefined}
             onRoomSelect={handleRoomSelect}
             onCreateRoom={handleCreateRoom}
-            isLoading={isLoading}
+            isLoading={roomsLoading || membersLoading}
           />
         </div>
         <div className={chatWindowCss}>

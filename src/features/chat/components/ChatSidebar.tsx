@@ -1,22 +1,23 @@
 import { useState } from 'react';
+import React from 'react';
 import Icon from '@/components/Icon';
 import Input from '@/components/Input/Input';
 import { css } from '@/styled-system/css';
 
-import { useChatRooms } from '../hooks/useChatApi';
-import { createRoomName, useFetchMembers } from '../hooks/useMembers';
-import type { ChatRoomDTO, ChatUser } from '../types/chatTypes';
+import { type MemberResponse } from '../apis/memberApi';
+import { createRoomName } from '../hooks/useMembers';
+import type { ChatRoomDTO } from '../types/chatTypes';
 import ContactItem from './ContactItem';
 
 interface ChatSidebarProps {
   width?: number | string;
   searchPlaceholder?: string;
-  rooms?: ChatRoomDTO[];
-  activeUsers?: ChatUser[];
+  chatRooms?: ChatRoomDTO[];
+  members?: MemberResponse[];
   selectedRoomId?: string;
   totalUnreadCount?: number;
   currentUsername?: string;
-  onRoomSelect?: (roomId: string, username: string) => void; // Updated signature
+  onRoomSelect?: (roomId: string, username: string) => void;
   onCreateRoom?: (roomName: string, participants: string[]) => Promise<void>;
   isLoading?: boolean;
 }
@@ -24,8 +25,8 @@ interface ChatSidebarProps {
 const ChatSidebar = ({
   width = '340px',
   searchPlaceholder = 'Search',
-  rooms: _rooms = [],
-  activeUsers: _activeUsers = [],
+  chatRooms = [],
+  members = [],
   selectedRoomId,
   totalUnreadCount: _totalUnreadCount = 0,
   currentUsername = 'user123',
@@ -35,10 +36,6 @@ const ChatSidebar = ({
 }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchMode, setIsSearchMode] = useState(false);
-
-  const { data: chatRooms = [], isLoading: roomsLoading } = useChatRooms();
-
-  const { data: members = [], isLoading: membersLoading } = useFetchMembers();
 
   const filteredRooms = chatRooms.filter((room) => {
     return (
@@ -75,8 +72,6 @@ const ChatSidebar = ({
       console.error('Failed to create room:', error);
     }
   };
-
-  const isLoadingData = isLoading || roomsLoading || membersLoading;
 
   return (
     <aside className={sidebarCss} style={{ width }}>
@@ -118,7 +113,7 @@ const ChatSidebar = ({
       </div>
 
       <div className={listCss}>
-        {isLoadingData ? (
+        {isLoading ? (
           <div className={loadingCss}>Loading {isSearchMode ? 'users' : 'chats'}...</div>
         ) : isSearchMode ? (
           filteredMembers.length > 0 ? (
@@ -160,7 +155,7 @@ const ChatSidebar = ({
                 name={room.otherMemberName}
                 lastMessage={lastMessage}
                 unread={0}
-                isOnline={false} 
+                isOnline={false}
                 isSelected={isSelected}
                 onClick={() => handleRoomClick(room)}
               />
@@ -177,7 +172,7 @@ const ChatSidebar = ({
   );
 };
 
-export default ChatSidebar;
+export default React.memo(ChatSidebar);
 
 const sidebarCss = css({
   width: '340px',
