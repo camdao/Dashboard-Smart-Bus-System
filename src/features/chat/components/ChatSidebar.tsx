@@ -172,7 +172,7 @@ const ChatSidebar = ({
   );
 };
 
-export default React.memo(ChatSidebar);
+export default ChatSidebar;
 
 const sidebarCss = css({
   width: '340px',
