@@ -25,15 +25,8 @@ export function useCreateChatRoom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      name,
-      member1Username,
-      member2Username,
-    }: {
-      name: string;
-      member1Username: string;
-      member2Username: string;
-    }) => createChatRoom(name, member1Username, member2Username),
+    mutationFn: ({ name, participantUsername }: { name: string; participantUsername: string }) =>
+      createChatRoom(name, participantUsername),
     onSuccess: (newRoom) => {
       queryClient.setQueryData(['chat', 'rooms'], (oldRooms: ChatRoom[] = []) => {
         const existingIndex = oldRooms.findIndex((room) => room.id === newRoom.id);

@@ -9,7 +9,7 @@ interface UseStompChatOptions {
   socketUrl: string;
   username?: string;
   chatRoomId?: string;
-  receiverUsername?: string; 
+  receiverUsername?: string;
   autoConnect?: boolean;
 }
 
@@ -184,7 +184,7 @@ export function useStompChat(options: UseStompChatOptions) {
 
   const createRoom = useCallback(
     async (roomName: string, participants: string[]) => {
-      if (!username || participants.length < 2) {
+      if (!username || participants.length < 1) {
         console.warn('❌ Cannot create room: invalid parameters');
         return;
       }
@@ -194,8 +194,7 @@ export function useStompChat(options: UseStompChatOptions) {
       try {
         const room = await createRoomMutation.mutateAsync({
           name: roomName,
-          member1Username: username,
-          member2Username: otherParticipant,
+          participantUsername: otherParticipant,
         });
 
         console.log('✅ Room created successfully:', room);

@@ -44,18 +44,12 @@ export async function getChatHistory(chatRoomId: number): Promise<Message[]> {
   return apiResponse.data;
 }
 
-export async function createChatRoom(
-  name: string,
-  member1Username: string,
-  member2Username: string,
-): Promise<ChatRoom> {
-  const response = await client.post('/api/chat/room', null, {
-    params: {
-      name,
-      member1Username,
-      member2Username,
-    },
+export async function createChatRoom(name: string, participantUsername: string): Promise<ChatRoom> {
+  const response = await client.post('/api/chat/room', {
+    name,
+    participantUsername,
   });
+
   const apiResponse = response as ApiResponse<ChatRoom>;
   return apiResponse.data;
 }

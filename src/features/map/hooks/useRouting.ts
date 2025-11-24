@@ -30,7 +30,7 @@ export function useRouting(from: [number, number], to: [number, number]) {
       setError(null);
 
       try {
-        const url = `https://router.project-osrm.org/route/v1/driving/${from[0]},${from[1]};${to[0]},${to[1]}?overview=full&geometries=geojson`;
+        const url = `http://192.168.1.110:5000/route/v1/car/${from[0]},${from[1]};${to[0]},${to[1]}?overview=full&geometries=geojson`;
         const response = await fetch(url);
         const data: RouteResponse = await response.json();
 
@@ -46,7 +46,6 @@ export function useRouting(from: [number, number], to: [number, number]) {
             },
           });
         } else {
-          // Fallback: đường thẳng
           setRoute({
             type: 'Feature',
             properties: {},
@@ -60,7 +59,6 @@ export function useRouting(from: [number, number], to: [number, number]) {
         if (!isCancelled) {
           console.warn('Error fetching route:', err);
           setError('Failed to fetch route');
-          // Fallback: đường thẳng
           setRoute({
             type: 'Feature',
             properties: {},
