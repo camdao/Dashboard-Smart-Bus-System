@@ -51,9 +51,6 @@ export function useStompChat(options: UseStompChatOptions) {
 
     const client = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
-      connectHeaders: {
-        username: username,
-      },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -63,7 +60,7 @@ export function useStompChat(options: UseStompChatOptions) {
       setIsConnected(true);
       setIsLoading(false);
 
-      client.subscribe(`/user/${username}/queue/messages`, (message) => {
+      client.subscribe('/user/queue/messages', (message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage;
         console.log('📩 Received personal message:', chatMessage);
 
@@ -85,31 +82,6 @@ export function useStompChat(options: UseStompChatOptions) {
           return [...prev, chatMessage];
         });
       });
-
-      if (chatRoomId) {
-        client.subscribe(`/topic/room/${chatRoomId}`, (message) => {
-          const roomMessage = JSON.parse(message.body) as ChatMessage;
-          console.log('📩 Received room message:', roomMessage);
-
-          setMessages((prev) => {
-            const exists = prev.some(
-              (m) =>
-                m.id === roomMessage.id ||
-                (m.content === roomMessage.content &&
-                  m.senderUsername === roomMessage.senderUsername &&
-                  m.timestamp === roomMessage.timestamp),
-            );
-
-            if (exists) {
-              console.log('⚠️ Message already exists, skipping');
-              return prev;
-            }
-
-            console.log('✅ Adding new room message to chat');
-            return [...prev, roomMessage];
-          });
-        });
-      }
     };
 
     client.onStompError = (frame) => {
